@@ -11,6 +11,8 @@
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+
 
     <!-- fonts-->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam:wght@400;600;700&display=swap" rel="stylesheet">
@@ -20,7 +22,7 @@
 
     
     <style>
-        :root{ --bs-font-sans-serif: 'Be Vietnam', system-ui; }
+        /* :root{ --bs-font-sans-serif: 'Be Vietnam', system-ui; } */
 
         .selectize-control {
             padding: 0;

@@ -7,11 +7,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
-
-        body {
-            font-family: 'rubik', sans-serif;
-        }
+       /* body{
+        font-family: var(--bs-font-sans-serif)  !important;
+       } */
 
         .totl-leads {
             padding: 35px 0 35px 35px !important;
@@ -100,9 +98,9 @@
             border-radius: 7px;
         }
 
-        img {
+        /* img {
             width: 100%;
-        }
+        } */
 
         @media screen and (max-width:767px) {
             .main-tabs,.main-appointment {
@@ -227,7 +225,7 @@
                             <div class="missing-report p">
                                 <h6 style="padding-left: 5px;">Missing Follow-Up Report</h6>
                                 <div class="chart">
-                                    <img src="{{ asset('assets/dashboard/images/pie.svg')}}">
+                                    <img src="{{ asset('assets/dashboard/images/pie.svg')}}" style="width:100%">
                                 </div>
                             </div>
                         </div>
@@ -239,7 +237,7 @@
         <div class="payment-section">
             <div class="col-md-12 mt-3">
                 <div class="line-chart">
-                    <img src="{{ asset('assets/dashboard/images/line.svg') }}">
+                    <img src="{{ asset('assets/dashboard/images/line.svg') }}" style="width:100%">
                 </div>
             </div>
         </div>

@@ -41,8 +41,8 @@ class OrderController extends Controller
             return DataTables::of($orders)
                 ->editColumn('order_number', function ($order) {
                     return $order->type == ORDER::SALE
-                        ? "SO-{$order->order_number}"
-                        : "PO-{$order->order_number}";
+                        ? "S-{$order->order_number}"
+                        : "P-{$order->order_number}";
                 })
                 ->editColumn('order_date', function ($order) {
                     return $order->order_date->format('d M, Y');
@@ -383,8 +383,8 @@ class OrderController extends Controller
             return DataTables::of($orders)
                 ->editColumn('order_number', function ($order) {
                     return $order->type == ORDER::SALE
-                        ? "SO-{$order->order_number}"
-                        : "PO-{$order->order_number}";
+                        ? "S-{$order->order_number}"
+                        : "P-{$order->order_number}";
                 })
                 ->editColumn('order_date', function ($order) {
                     return $order->order_date->format('d M, Y');
@@ -419,5 +419,65 @@ class OrderController extends Controller
         }
 
         return $totalPrice;
+    }
+
+    public function bills(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $orders = Order::orderBy('id', 'desc')->with(['party'])->get();
+
+            return DataTables::of($orders)
+                ->editColumn('order_number', function ($order) {
+                    return $order->type == ORDER::SALE
+                        ? "S-{$order->order_number}"
+                        : "P-{$order->order_number}";
+                })
+                ->editColumn('entry_type', function ($order) {
+                    return $order->entry_type == 1
+                        ? "Normal Sale"
+                        : "Direct Sale";
+                })
+                ->editColumn('order_date', function ($order) {
+                    return $order->order_date->format('d M, Y');
+                })
+                ->editColumn('due_date', function ($order) {
+                    return $order->due_date->format('d M, Y');
+                })
+                ->editColumn('status', function ($order) {
+                    return ucwords($order->status);
+                })
+                ->addColumn('action', function ($order) {
+                    return view('orders.bill-button')->with(['order' => $order]);
+                })
+                ->make(true);
+        }
+
+        $parties = Party::orderBy('name')->pluck('name', 'id');
+        return view('orders.bills', compact('parties'));
+    }
+
+    public function prints(Order $order)
+    {
+        $order->load(['orderItems.item']);
+
+        if ($order->transferTransactions()->count() > 0) {
+            $order->load([
+                'transferTransactions.item',
+                'transferTransactions.transaction',
+                'transactions' => function ($query) {
+                    $query->where('amt_debt', '>', 0);
+                    // ->orderBy('id', 'asc');
+                },
+
+                'transferTransactions.transport',
+                'party',
+            ]);
+        }
+        // return $order;
+        // dd($order);
+        $total_amount = $order->orderItems->sum('total_price');
+
+        return view('orders.print', compact('order', 'total_amount'));
     }
 }

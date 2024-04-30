@@ -102,6 +102,11 @@ Route::middleware('auth')->group(function () {
     Route::get('isExistStock', [Controllers\JobsController::class,'isExistStock']);
     Route::get('deleteExistStock', [Controllers\JobsController::class,'deleteExistStock']);
 
+    // orders bills
+    Route::get('order-bills', [Controllers\OrderController::class, 'bills'])->name('order.bills');
+    Route::get('order-prints', [Controllers\OrderController::class, 'prints'])->name('order.prints');
+
+
 
 
     // account vouchers

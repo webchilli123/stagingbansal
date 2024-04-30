@@ -1,15 +1,30 @@
+
+<style>
+    .list-group .list-group-item.active {
+    background-color: #0d79ab !important;
+    color: white;
+}
+body{
+    font-family: var(--bs-font-sans-serif) !important;
+    font-size: 0.9rem !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    -webkit-text-size-adjust: 100% !important;
+
+    }
+</style>
 {{-- sidebar --}}
 <aside class="col-10 col-md-3 col-xl-2 px-0 shadow-sm bg-white position-fixed 
     top-0 left-0 h-100 sidebar overflow-auto d-print-none" id="sidebar" style="z-index: 100;">
     <img src="{{ asset('assets/img/curtis.png') }}" class="d-block mx-auto my-4 pb-2" width="140" alt="curtis-logo">
     <section class="list-group rounded-0">
 
-        <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action border-0 d-flex justify-content-between {{request()->routeIs('dashboard') ? 'active' : ''}}">
-            <span>
-                <i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp; Dashboard
-            </span>
-            
-        </a>
+    <a  href="{{ route('dashboard') }}" class="list-group-item list-group-item-action border-0 d-flex justify-content-between {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <span>
+            <i class="fa fa-home" aria-hidden="true"></i>&nbsp;&nbsp; Dashboard
+        </span>
+    </a>
+
 
 
         @if(auth()->user()->can('viewAny', App\Models\Item::class)
@@ -106,9 +121,9 @@
                 <a href="{{ route('direct.sale.listing') }}" class="list-group-item list-group-item-action border-0">
                     <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Direct Orders
                 </a>
-                <!-- <a href="{{ route('orders.index') }}" class="list-group-item list-group-item-action border-0">
-                    <i class="fa fa-store me-2"></i> Orders
-                </a> -->
+                <a href="{{ route('order.bills') }}" class="list-group-item list-group-item-action border-0">
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i> Orders BIlls
+                </a>
             </div>
         </div>
         @endcan
