@@ -121,9 +121,30 @@ body{
                 <a href="{{ route('direct.sale.listing') }}" class="list-group-item list-group-item-action border-0">
                     <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Direct Orders
                 </a>
-                <a href="{{ route('order.bills') }}" class="list-group-item list-group-item-action border-0">
-                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i> Orders BIlls
+            </div>
+        </div>
+        @endcan
+
+        @can('create', App\Models\Order::class)
+        <a class="list-group-item list-group-item-action border-0 d-flex justify-content-between {{request()->routeIs('order.sale.bills') || request()->routeIs('order.purchase.bills') ? 'active' : ''}}" data-bs-toggle="collapse" href="#bills-collapse" role="button">
+            <span>
+                <i class="fa fa-shopping-cart me-2"></i> Bills
+            </span>
+            <i class="fa fa-angle-down"></i>
+        </a>
+        <div class="collapse" id="bills-collapse" data-bs-parent="#sidebar">
+            <div class="list-group">
+
+                <!-- <a href="{{ route('direct.sale.create') }}" class="list-group-item list-group-item-action border-0">
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-plus-circle" aria-hidden="true"></i> Create Direct Order
+                </a> -->
+                <a href="{{ route('order.sale.bills') }}" class="list-group-item list-group-item-action border-0">
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i> Sale BIlls
                 </a>
+                <a href="{{ route('order.purchase.bills') }}" class="list-group-item list-group-item-action border-0">
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Purchase Bills
+                </a>
+                
             </div>
         </div>
         @endcan

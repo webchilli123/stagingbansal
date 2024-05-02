@@ -383,8 +383,8 @@ class OrderController extends Controller
             return DataTables::of($orders)
                 ->editColumn('order_number', function ($order) {
                     return $order->type == ORDER::SALE
-                        ? "S-{$order->order_number}"
-                        : "P-{$order->order_number}";
+                        ? "SO-{$order->order_number}"
+                        : "PO-{$order->order_number}";
                 })
                 ->editColumn('order_date', function ($order) {
                     return $order->order_date->format('d M, Y');
@@ -421,11 +421,11 @@ class OrderController extends Controller
         return $totalPrice;
     }
 
-    public function bills(Request $request)
+    public function sale_bills(Request $request)
     {
         if ($request->ajax()) {
 
-            $orders = Order::orderBy('id', 'desc')->with(['party'])->get();
+            $orders = Order::where('type','sale')->orderBy('id', 'desc')->with(['party'])->get();
 
             return DataTables::of($orders)
                 ->editColumn('order_number', function ($order) {
@@ -454,7 +454,114 @@ class OrderController extends Controller
         }
 
         $parties = Party::orderBy('name')->pluck('name', 'id');
-        return view('orders.bills', compact('parties'));
+        return view('orders.sale-bills', compact('parties'));
+    }
+
+
+    public function purchase_bills(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $orders = Order::where('type','purchase')->orderBy('id', 'desc')->with(['party'])->get();
+
+            return DataTables::of($orders)
+                ->editColumn('order_number', function ($order) {
+                    return $order->type == ORDER::SALE
+                        ? "S-{$order->order_number}"
+                        : "P-{$order->order_number}";
+                })
+                ->editColumn('entry_type', function ($order) {
+                    return $order->entry_type == 1
+                        ? "Normal Sale"
+                        : "Direct Sale";
+                })
+                ->editColumn('order_date', function ($order) {
+                    return $order->order_date->format('d M, Y');
+                })
+                ->editColumn('due_date', function ($order) {
+                    return $order->due_date->format('d M, Y');
+                })
+                ->editColumn('status', function ($order) {
+                    return ucwords($order->status);
+                })
+                ->addColumn('action', function ($order) {
+                    return view('orders.bill-button')->with(['order' => $order]);
+                })
+                ->make(true);
+        }
+
+        $parties = Party::orderBy('name')->pluck('name', 'id');
+        return view('orders.purchase-bills', compact('parties'));
+    }
+
+    
+    public function bill_purchase_create()
+    {
+        $parties = Party::orderBy('name')->pluck('name', 'id');
+        return view('orders.create_purchase_bills', compact('parties'));
+
+    }
+
+    public function bill_sale_create()
+    {
+        $parties = Party::orderBy('name')->pluck('name', 'id');
+        return view('orders.create_sale_bills', compact('parties'));
+
+    }
+
+    public function getOrdersByParty(Request $request)
+    {
+        // Retrieve partyId from the request data
+        $partyId = $request->input('partyId');
+
+        // Fetch orders associated with the specified partyId
+        $orders = Order::where('party_id', $partyId)
+                        ->where('type', 'purchase')
+                        ->where(function ($query) {
+                            $query->where('status', 'pending')
+                                ->orWhere('status', 'incomplete');
+                        })
+                        ->get();
+        // Return orders as JSON response
+        return response()->json(['orders' => $orders]);
+    }
+
+    public function getOrder(Request $request)
+    {
+        // Retrieve partyId from the request data
+        $partyId = $request->input('partyId');
+
+        // Fetch orders associated with the specified partyId
+        $orders = Order::where('party_id', $partyId)
+                        ->where('type', 'sale')
+                        ->where(function ($query) {
+                            $query->where('status', 'pending')
+                                ->orWhere('status', 'incomplete');
+                        })
+                        ->get();
+
+        // Return orders as JSON response
+        return response()->json(['orders' => $orders]);
+    }
+    
+    public function fetch_item_details(Request $request)
+    {
+        $orderNumber = $request->input('orderNumber');
+        // Fetch order based on order number
+        $order = Order::where('id', $orderNumber)->first();
+
+        if ($orderNumber) {
+            // Fetch item details associated with the order
+            $order_items = OrderItem::where('order_id', $orderNumber)->first();
+
+            $items = Item::where('id', $order_items->item_id)->get();
+            
+            // Return item details as JSON response
+            return response()->json(['items' => $items]);
+        } else {
+            // Order not found, return empty response or appropriate error message
+            return response()->json(['message' => 'Order not found'], 404);
+        }
     }
 
     public function prints(Order $order)

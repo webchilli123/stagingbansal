@@ -103,10 +103,16 @@ Route::middleware('auth')->group(function () {
     Route::get('deleteExistStock', [Controllers\JobsController::class,'deleteExistStock']);
 
     // orders bills
-    Route::get('order-bills', [Controllers\OrderController::class, 'bills'])->name('order.bills');
+    Route::get('order-sale-bills', [Controllers\OrderController::class, 'sale_bills'])->name('order.sale.bills');
+    Route::get('order-purchase-bills', [Controllers\OrderController::class, 'purchase_bills'])->name('order.purchase.bills');
     Route::get('order-prints', [Controllers\OrderController::class, 'prints'])->name('order.prints');
+    Route::get('bill-purchase-create', [Controllers\OrderController::class, 'bill_purchase_create'])->name('bill.purchase.create');
+    Route::get('bill-sale-create', [Controllers\OrderController::class, 'bill_sale_create'])->name('bill.sale.create');
+    Route::get('add-bill', [Controllers\OrderController::class, 'getOrdersByParty'])->name('get.order.by.party');
+    Route::get('add-sale-bill', [Controllers\OrderController::class, 'getOrder'])->name('get.order');
+    Route::get('fetch-item-details', [Controllers\OrderController::class, 'fetch_item_details'])->name('fetch.item.details');
 
-
+    
 
 
     // account vouchers
