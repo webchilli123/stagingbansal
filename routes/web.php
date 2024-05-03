@@ -111,6 +111,8 @@ Route::middleware('auth')->group(function () {
     Route::get('add-bill', [Controllers\OrderController::class, 'getOrdersByParty'])->name('get.order.by.party');
     Route::get('add-sale-bill', [Controllers\OrderController::class, 'getOrder'])->name('get.order');
     Route::get('fetch-item-details', [Controllers\OrderController::class, 'fetch_item_details'])->name('fetch.item.details');
+    Route::get('fetch-purchase-item-details', [Controllers\OrderController::class, 'fetch_purchase_item_details'])->name('fetch.purchase.item.details');
+    Route::post('bills-store', [Controllers\OrderController::class, 'storeBills'])->name('bills.store');
 
     
 

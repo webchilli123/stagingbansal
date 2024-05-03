@@ -13,12 +13,10 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
 
-
     <!-- fonts-->
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam:wght@400;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
 
     
     <style>
@@ -94,6 +92,7 @@
             setTimeout(()=>{ $('#success').remove(); }, 3000);
         });
     </script>
+
     @stack('scripts')
 </body>
 </html>

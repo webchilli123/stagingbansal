@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Item;
 use App\Models\Party;
+use App\Models\Bill;
 use App\Models\TransferTransaction;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -545,24 +546,95 @@ class OrderController extends Controller
     }
     
     public function fetch_item_details(Request $request)
-    {
-        $orderNumber = $request->input('orderNumber');
-        // Fetch order based on order number
-        $order = Order::where('id', $orderNumber)->first();
+{
+    $orderNumber = $request->input('orderNumber');
+    // Fetch order based on order number
+    $order = Order::find($orderNumber);
 
-        if ($orderNumber) {
-            // Fetch item details associated with the order
-            $order_items = OrderItem::where('order_id', $orderNumber)->first();
+    if ($order) {
+        // Fetch all item details associated with the order
+        $orderItems = OrderItem::where('order_id', $orderNumber)->get();
 
-            $items = Item::where('id', $order_items->item_id)->get();
-            
-            // Return item details as JSON response
-            return response()->json(['items' => $items]);
-        } else {
-            // Order not found, return empty response or appropriate error message
-            return response()->json(['message' => 'Order not found'], 404);
+        // Array to hold item details
+        $items = [];
+
+        // Loop through each order item and fetch the item details
+        foreach ($orderItems as $orderItem) {
+            $item = $orderItem->item; // Access the related item
+            if ($item) {
+                // Include the order ID in the item details
+                $order_id = $orderItem->order_id;
+                $item->order_id = $order_id;
+                $items[] = $item;
+            }
         }
+
+        // Return item details as JSON response
+        return response()->json(['items' => $items]);
+    } else {
+        // Order not found, return empty response or appropriate error message
+        return response()->json(['message' => 'Order not found'], 404);
     }
+}
+public function fetch_purchase_item_details(Request $request)
+{
+    $orderNumber = $request->input('orderNumber');
+   
+    // Fetch order based on order number
+    $order = Order::find($orderNumber);
+
+    if ($order) {
+        // Fetch all item details associated with the order
+        $orderItems = OrderItem::where('order_id', $orderNumber)->get();
+
+        // Array to hold item details
+        $items = [];
+
+        // Loop through each order item and fetch the item details
+        foreach ($orderItems as $orderItem) {
+            $item = $orderItem->item; // Access the related item
+            if ($item) {
+                // Include the order ID in the item details
+                $order_id = $orderItem->order_id;
+                $item->order_id = $order_id;
+                $items[] = $item;
+            }
+        }
+
+        // Return item details with order_id as JSON response
+        return response()->json(['items' => $items]);
+    } else {
+        // Order not found, return empty response or appropriate error message
+        return response()->json(['message' => 'Order not found'], 404);
+    }
+}
+
+
+
+    public function storeBills(Request $request)
+    {
+        $fields = $request->all();
+        $items = json_decode($fields['tableData']);
+        
+        foreach($items as $data){
+
+            $bill = new bill();
+            $bill->order_number = $data->{0}; // Assuming item_id corresponds to the id field of stdClass object
+            $bill->item_number = $data->{1}; // Assuming name corresponds to the third element of stdClass object
+            $bill->total_quantity = $data->{4};
+            $bill->sent_quantity = $data->{3};
+            $bill->rate = $data->{5}; // Assuming item_id corresponds to the id field of stdClass object
+            $bill->total_price = $data->{6}; // Assuming name corresponds to the third element of stdClass object
+            $bill->narration = $fields['narration'];
+            $bill->whats_app_narration = $fields['wa_narration'];
+
+            $bill->save();
+            
+        }
+        
+
+    }
+
 
     public function prints(Order $order)
     {

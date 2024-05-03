@@ -48,14 +48,12 @@
     </div>
 </div>
 <div class="col-md-12 col-lg-6 mb-3">
-    <label for="orders" class="form-label">Orders</label>
-    <div class="input-group">
-        <select name="order_id[]" id="orders" class="form-control select-single" required>
-            <option value="" disabled selected>-- Select Order --</option>
-            <!-- Single option to show initially -->
-        </select>
-    </div>
+    <label class="form-label">Orders</label>
+    <select name="order_id[]" id="orders" class="form-control mb-1" multiple required>
+        <!-- Options will be added dynamically via JavaScript -->
+    </select>
 </div>
+
 
 
     
@@ -64,15 +62,15 @@
 {{-- order items --}}
 @include('orders.bill-order-items')
 
-<footer class="d-flex justify-content-between mt-3 mt-lg-0 mb-4">
-    <button class="btn btn-primary" id="add-row">
-        <span class="fa fa-plus"></span>
-    </button>
-    <button class="btn btn-danger" id="remove-row">
-        <i class="fa fa-times"></i>
-    </button>
+    <!-- <footer class="d-flex justify-content-between mt-3 mt-lg-0 mb-4">
+        <button class="btn btn-primary" id="add-row">
+            <span class="fa fa-plus"></span>
+        </button>
+        <button class="btn btn-danger" id="remove-row">
+            <i class="fa fa-times"></i>
+        </button>
 
-</footer>
+    </footer> -->
 
 <div class="mb-3">
     <label for="" class="form-label">Narration</label>
@@ -87,7 +85,14 @@
 
 
 @push('scripts')
+<!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<!-- Include jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script>
     function enableSelectize(){
        $('table#order tbody').find('select').selectize({ sortField: 'text' });
@@ -206,60 +211,96 @@
 </script>
 
 <script>
+    
     $(document).ready(function(){
-        // Handle change event on party select
-        $('#party').change(function(){
-            $(this).removeClass('select-single');
-            var partyId = $(this).val();
-            if(partyId !== ''){
-                // Fetch orders for the selected party via AJAX
-                $.ajax({
-                    url: '{{ route('get.order') }}',
-                    type: 'GET',
-                    data: { partyId: partyId }, // Send partyId as data
-                    success: function(response){
-                        $('#orders').find('option').not(':first').remove();
+    // Initialize Select2
+    $('#orders').select2({
+        placeholder: "-- Select Order --",
+        allowClear: true,
+        templateResult: formatOrder,
+        templateSelection: formatOrderSelection
+    });
 
-    // Append options for each order
-    $.each(response.orders, function (key, value) {
-        $("#orders").append('<option value="' + value.id + '">' + value.order_number + '</option>');
+    // Handle change event on party select
+    $('#party').change(function(){
+        $(this).removeClass('select-single');
+        var partyId = $(this).val();
+        if(partyId !== ''){
+            // Fetch orders for the selected party via AJAX
+            $.ajax({
+                url: '{{ route('get.order') }}',
+                type: 'GET',
+                data: { partyId: partyId }, // Send partyId as data
+                success: function(response){
+                    // Clear existing options
+                    $('#orders').empty();
+
+                    // Append options for each order
+                    $.each(response.orders, function (key, value) {
+                        $('#orders').append(
+                            '<option value="' + value.id + '">' + value.order_number + '</option>'
+                        );
+                    });
+
+                    // Refresh Select2 to update options
+                    $('#orders').select2({
+                        placeholder: "-- Select Order --",
+                        allowClear: true,
+                        templateResult: formatOrder,
+                        templateSelection: formatOrderSelection
+                    });
+                },
+                error: function(xhr){
+                    console.log(xhr.responseText);
+                }
+            });
+        } else {
+            // Reset select when no party is selected
+            $('#orders').empty();
+        }
     });
-                    },
-                    error: function(xhr){
-                        console.log(xhr.responseText);
-                    }
-                });
-            } else {
-                // Reset orders select when no party is selected
-                $('#orders').empty().prop('disabled', true);
-            }
-        });
-    });
+});
+
+// Function to format each option in Select2
+function formatOrder (order) {
+    if (!order.id) { return order.text; }
+    var $order = $(
+        '<span>' + order.text + '</span>'
+    );
+    return $order;
+}
+
+// Function to format the selected option in Select2
+function formatOrderSelection (order) {
+    return order.text;
+}
+
 
     $(document).ready(function(){
     // Function to fetch item details based on selected order number
     function fetchItemDetails(orderNumber) {
-        $.ajax({
-            url: '{{ route('fetch.item.details') }}',
-            type: 'GET',
-            data: { orderNumber: orderNumber },
-            success: function(response){
-                // Check if response contains items
-                if(response.items.length > 0) {
-                        updateTableWithItemDetails(response.items);
-                    } else {
-                        // Display a message if no items found
-                        $('#order tbody').html('<tr><td colspan="5">No items found for this order.</td></tr>');
-                    }
-                },
-            error: function(xhr){
-                console.log(xhr.responseText);
+    $.ajax({
+        url: '{{ route('fetch.item.details') }}',
+        type: 'GET',
+        data: { orderNumber: orderNumber }, // Send single order number
+        success: function(response){
+            // Check if response contains items
+            if(response.items.length > 0) {
+                updateTableWithItemDetails(response.items);
+            } else {
+                // Display a message if no items found
+                $('#order tbody').html('<tr><td colspan="5">No items found for this order.</td></tr>');
             }
-        });
-    }
+        },
+        error: function(xhr){
+            console.log(xhr.responseText);
+        }
+    });
+}
 
     // Event listener for order selection
     $(document).on('change', '#orders', function(){
+        
         var selectedOrderNumber = $(this).val();
         if(selectedOrderNumber) {
             fetchItemDetails(selectedOrderNumber);
@@ -267,24 +308,97 @@
     });
 });
 
+
 function updateTableWithItemDetails(items) {
     var tableBody = $('#order tbody');
-    tableBody.empty(); // Clear existing table rows
+    console.log("Updating table with item details:", items);
+    var existingRows = tableBody.find('tr');
 
-    // Loop through each item and add a row to the table
-    $.each(items, function(index, item) {
-        var row = '<tr>' +
-                      '<td>' + item.name + '</td>' +
-                      '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
-                      '<td>' + item.total_quantity + '</td>' +
-                      '<td>' + item.rate + '</td>' +
-                      '<td>' + item.total_price + '</td>' +
-                  '</tr>';
-        tableBody.append(row);
-    });
+    // Check if there are existing rows in the table
+    if (existingRows.length > 0) {
+        // Append new rows for the items to the existing table
+        $.each(items, function(index, item) {
+            var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
+            '<td>' + item.id + '</td>' + // Item ID
+            '<td>' + item.order_id + '</td>' + // Order ID
+            '<td>' + item.name + '</td>' +
+            '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
+            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.rate + '</td>' +
+            '<td>' + item.total_price + '</td>' +
+            '</tr>';
+            tableBody.append(row);
+        });
+    } else {
+        // If no existing rows, replace the table with new rows
+        var rows = ''; // String to hold HTML rows for all items
+        $.each(items, function(index, item) {
+            var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
+            '<td>' + item.id + '</td>' + // Item ID
+            '<td>' + item.order_id + '</td>' + // Order ID
+            '<td>' + item.name + '</td>' +
+            '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
+            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.rate + '</td>' +
+            '<td>' + item.total_price + '</td>' +
+            '</tr>';
+            rows += row; // Append current row to the rows string
+        });
+        tableBody.html(rows);
+    }
 }
 </script>
 
+<script>
+    $(document).ready(function() {
+        // Event listener for form submission
+        $('#bill-submit').submit(function(event) {
+            event.preventDefault(); // Prevent the default form submission
 
+            // Extract data from the form
+            var formData = $(this).serialize();
+
+            // Extract table data and append it to the form data
+            var tableData = [];
+            $('#order tbody tr').each(function(index) {
+                var rowData = {};
+                $(this).find('td').each(function() {
+                    var fieldName = $(this).index();
+                    var fieldValue = $(this).text();
+                    rowData[fieldName] = fieldValue;
+                });
+                tableData.push(rowData);
+            });
+
+        formData += '&tableData=' + JSON.stringify(tableData);
+
+            // Now you can send the data to the controller using AJAX
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Handle success response
+                    console.log('Data sent successfully:', response);
+                    // Optionally, you can redirect the user to another page
+                    // window.location.href = '/success-page';
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    console.error('Error sending data:', error);
+                }
+            });
+        });
+    });
+</script>
+
+
+<script>
+        $(document).ready(()=>{
+        $('select').selectize({
+            plugins: ["remove_button"],
+        });
+    });
+    </script>
 
 @endpush
