@@ -1,5 +1,4 @@
-@extends('layouts.dashboard')
-@section('content')
+
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
@@ -13,12 +12,10 @@
         color: #d8c510;
     }
 </style>
-<div id="container-placeholder">
 <header class="d-flex justify-content-between align-items-center mb-4">
     <h5> </h5>
     <div>
         <button class="btn btn-sm btn-success text-white me-1" onclick="return window.print();">Print</button>
-        <a href="{{ route('order.sale.bills') }}" class="btn btn-sm btn-secondary">Back</a>
     </div>
 </header>
 
@@ -97,7 +94,7 @@
 
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i>
-    Purchase
+    Sale
 </h6>
 <section class="table-responsive rounded mb-2">
     <table class="table table-bordered align-middle" style="min-width: 60rem;">
@@ -239,11 +236,6 @@
         </tbody>
     </table>
 </section>
-</div> 
-
-
-@endsection
-
 
 @push('scripts')
 <script>

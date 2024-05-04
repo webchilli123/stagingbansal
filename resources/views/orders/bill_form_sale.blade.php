@@ -20,10 +20,14 @@
     background-color: #fff;
     color: #000;
 }
+  
 
     
 </style>
+<div id="container-placeholder" >
+
 @csrf
+
 <section class="row">
 
 <div class="col-md-12 col-lg-6 mb-3">
@@ -83,7 +87,7 @@
 
 <button type="submit" class="btn btn-primary mb-5">{{ $mode == 'create' ? 'Save' : 'Update' }}</button>
 
-
+</div>
 @push('scripts')
 <!-- Include Select2 CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />

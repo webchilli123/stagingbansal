@@ -615,7 +615,8 @@ public function fetch_purchase_item_details(Request $request)
     {
         $fields = $request->all();
         $items = json_decode($fields['tableData']);
-        
+        $bill_id = 'sale-' . rand(1111, 9999);
+
         foreach($items as $data){
 
             $bill = new bill();
@@ -627,13 +628,15 @@ public function fetch_purchase_item_details(Request $request)
             $bill->total_price = $data->{6}; // Assuming name corresponds to the third element of stdClass object
             $bill->narration = $fields['narration'];
             $bill->whats_app_narration = $fields['wa_narration'];
+            $bill->bill_id = $bill_id;
+            $bill->bill_type = 'sale';
 
             $bill->save();
     
         }
-
+        $bills = Bill::where('bill_id',$bill_id)->get();
         // Return the HTML content of the view
-        $viewContent = view('orders.bill-print')->render();
+        $viewContent = view('orders.bill-print', compact('bills'))->render();
 
         // Return response
         return response()->json(['html' => $viewContent]);
