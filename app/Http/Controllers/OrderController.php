@@ -629,10 +629,15 @@ public function fetch_purchase_item_details(Request $request)
             $bill->whats_app_narration = $fields['wa_narration'];
 
             $bill->save();
-            
+    
         }
-        
 
+        // Return the HTML content of the view
+        $viewContent = view('orders.bill-print')->render();
+
+        // Return response
+        return response()->json(['html' => $viewContent]);
+        
     }
 
 

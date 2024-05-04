@@ -379,8 +379,8 @@ function updateTableWithItemDetails(items) {
                 data: formData,
                 success: function(response) {
                     // Handle success response
-                    console.log('Data sent successfully:', response);
-                    // Optionally, you can redirect the user to another page
+                    $('#container-placeholder').html(response.html);
+                    console.log(response.html);                    // Optionally, you can redirect the user to another page
                     // window.location.href = '/success-page';
                 },
                 error: function(xhr, status, error) {
