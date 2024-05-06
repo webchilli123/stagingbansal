@@ -102,7 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::get('isExistStock', [Controllers\JobsController::class,'isExistStock']);
     Route::get('deleteExistStock', [Controllers\JobsController::class,'deleteExistStock']);
 
-    // orders bills
+    // orders bills - sale & purchase
     Route::get('order-sale-bills', [Controllers\OrderController::class, 'sale_bills'])->name('order.sale.bills');
     Route::get('order-purchase-bills', [Controllers\OrderController::class, 'purchase_bills'])->name('order.purchase.bills');
     Route::get('order-prints', [Controllers\OrderController::class, 'prints'])->name('order.prints');
