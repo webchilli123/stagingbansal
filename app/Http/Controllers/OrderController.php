@@ -426,7 +426,15 @@ class OrderController extends Controller
     {
         if ($request->ajax()) {
 
-            $orders = Order::where('type','sale')->orderBy('id', 'desc')->with(['party'])->get();
+            $orders = $orders = Order::where('type', 'sale')
+            ->orderBy('id', 'desc')
+            ->with(['party'])
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('bills')
+                      ->whereColumn('bills.order_number', 'orders.id');
+            })
+            ->get();
 
             return DataTables::of($orders)
                 ->editColumn('order_number', function ($order) {
@@ -662,7 +670,7 @@ public function fetch_purchase_item_details(Request $request)
 
 
     public function prints(Order $order)
-    {
+    {   
         $order->load(['orderItems.item']);
 
         if ($order->transferTransactions()->count() > 0) {
@@ -683,5 +691,28 @@ public function fetch_purchase_item_details(Request $request)
         $total_amount = $order->orderItems->sum('total_price');
 
         return view('orders.print', compact('order', 'total_amount'));
+    }
+
+    public function bill_prints(Request $request)
+    {   
+        $bill = $request->all();
+        
+        $orders = Order::where('id',$bill['order'])->get();
+
+        $bill = Bill::where('order_number', $bill['order'])->first();
+        
+        if ($bill) {
+            $bill_id = $bill->bill_id;
+            // Now you can use $bill_id as needed
+        }
+
+        $bills = Bill::where('bill_id', $bill_id)
+                        ->join('items', 'items.id', '=', 'bills.item_number')
+                        ->select('bills.*', 'items.name as item_name')
+                        ->get();
+  
+        // dd($order);
+
+        return view('orders.bill-print-outside', compact('bills','orders'));
     }
 }
