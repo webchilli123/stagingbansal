@@ -238,7 +238,7 @@
                 success: function(response){
                     // Clear existing options
                     $('#orders').empty();
-
+                    $('#order tbody').empty();
                     // Append options for each order
                     $.each(response.orders, function (key, value) {
                         $('#orders').append(

@@ -16,7 +16,7 @@
       <tr>
         <th></th>
         <th>Id</th>
-        <th>Order No.</th>
+        <th>Bill ID</th>
         <th></th>
         <th>Status</th>
         <th>Order Date</th>
@@ -55,15 +55,14 @@
                     defaultContent: ''
                   }, 
                   { data: 'id', visible: false, searchable: false },
-                  { data: 'order_number', name: 'order_number' },
+                  { data: 'bill_id', name: 'bill_id' },
                   { data: 'type', name: 'type', visible: false },
                   { data: 'status', name: 'status' },
                   { data: 'order_date', name: 'order_date' },
                   { data: 'due_date', name: 'due_date' },
                   { data: 'party.name', name: 'party.name'},
                   { data: 'party_id', name: 'party_id', visible: false },
-                  { data: 'entry_type', name: 'entry_type'
-                  },
+                  { data: 'entry_type', name: 'entry_type'},
                   { data: 'action', 'orderable': false, searchable: false,}
               ],
           });

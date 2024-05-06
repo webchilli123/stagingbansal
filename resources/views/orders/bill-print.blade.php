@@ -32,7 +32,7 @@
         <tbody>
         @foreach($orders as $order)
             <tr>
-                <td>{{ $order->order_number }}</td>
+                <td>{{ $order->id }}</td>
                 <td>{{ ucfirst($order->type) }}</td>
                 <td><span class="badge alert-primary">{{ ucwords($order->status) }}</span></td>
                 <td>{{ optional($order->order_date)->format('d M, Y') }}</td>

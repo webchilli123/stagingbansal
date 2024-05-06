@@ -424,19 +424,22 @@ class OrderController extends Controller
 
     public function sale_bills(Request $request)
     {
+       
         if ($request->ajax()) {
 
-            $orders = $orders = Order::where('type', 'sale')
+            $orders = Order::where('type', 'sale')
             ->orderBy('id', 'desc')
             ->with(['party'])
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                      ->from('bills')
-                      ->whereColumn('bills.order_number', 'orders.id');
-            })
+            ->join('bills', 'bills.order_number', '=', 'orders.id') // Join the bills table
+            ->select('orders.*', 'bills.bill_id') // Select the order columns and the bill_id column
+            ->groupBy('bills.bill_id') // Group by bill_id to ensure each bill_id appears only once
             ->get();
 
+           
             return DataTables::of($orders)
+                ->editColumn('bill_id', function ($order) {
+                    return ucfirst($order->bill_id);
+                })
                 ->editColumn('order_number', function ($order) {
                     return $order->type == ORDER::SALE
                         ? "S-{$order->order_number}"
@@ -695,17 +698,13 @@ public function fetch_purchase_item_details(Request $request)
 
     public function bill_prints(Request $request)
     {   
-        $bill = $request->all();
-        
-        $orders = Order::where('id',$bill['order'])->get();
-
-        $bill = Bill::where('order_number', $bill['order'])->first();
-        
-        if ($bill) {
-            $bill_id = $bill->bill_id;
-            // Now you can use $bill_id as needed
+        $bill_id = $request->all();
+        $data = Bill::where('bill_id',$bill_id['order'])->get();
+        foreach($data as $bill){
+            $orders = Order::where('id', $bill->order_number)->get();
         }
-
+echo "<pre>";
+print_r($orders);die;
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')
                         ->select('bills.*', 'items.name as item_name')
