@@ -5,7 +5,7 @@
                 <th>ID</th>
                 <th>Order ID</th>
                 <th>Item</th>
-                <th>Received</th>
+                <th>Sent Quantity</th>
                 <th>Total Quantity (Kg)</th>
                 <th>Rate</th>
                 <th>Total Price</th>

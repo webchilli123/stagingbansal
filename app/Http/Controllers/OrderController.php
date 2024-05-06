@@ -614,6 +614,11 @@ public function fetch_purchase_item_details(Request $request)
     public function storeBills(Request $request)
     {
         $fields = $request->all();
+        // echo "<pre>";
+        //     print_r($fields);die;
+        foreach($fields['order_id'] as $order){
+            $orders = Order::where('id',$order)->get();
+        } 
         $items = json_decode($fields['tableData']);
         $bill_id = 'sale-' . rand(1111, 9999);
 
@@ -622,7 +627,7 @@ public function fetch_purchase_item_details(Request $request)
             $bill = new bill();
             $bill->order_number = $data->{0}; // Assuming item_id corresponds to the id field of stdClass object
             $bill->item_number = $data->{1}; // Assuming name corresponds to the third element of stdClass object
-            $bill->total_quantity = $data->{4};
+            $bill->total_quantity = $data->{4} - $data->{3};
             $bill->sent_quantity = $data->{3};
             $bill->rate = $data->{5}; // Assuming item_id corresponds to the id field of stdClass object
             $bill->total_price = $data->{6}; // Assuming name corresponds to the third element of stdClass object
@@ -632,11 +637,23 @@ public function fetch_purchase_item_details(Request $request)
             $bill->bill_type = 'sale';
 
             $bill->save();
+
+            $orderItem = OrderItem::where('item_id', $data->{1})->first();
+
+            if ($orderItem) {
+                $orderItem->decrement('ordered_quantity', $data->{3});
+            }
+            
     
         }
-        $bills = Bill::where('bill_id',$bill_id)->get();
+        $bills = Bill::where('bill_id', $bill_id)
+                        ->join('items', 'items.id', '=', 'bills.item_number')
+                        ->select('bills.*', 'items.name as item_name')
+                        ->get();
+
+        
         // Return the HTML content of the view
-        $viewContent = view('orders.bill-print', compact('bills'))->render();
+        $viewContent = view('orders.bill-print', compact('bills','orders'))->render();
 
         // Return response
         return response()->json(['html' => $viewContent]);

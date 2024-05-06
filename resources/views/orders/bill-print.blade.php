@@ -1,5 +1,3 @@
-
-
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -32,14 +30,17 @@
             </tr>
         </thead>
         <tbody>
-        <tr>
-    <td></td>
-    <td></td>
-    <td><span class="badge alert-primary"></span></td>
-    <td></td>
-    <td></td>
-    <td></td>
-</tr>
+        @foreach($orders as $order)
+            <tr>
+                <td>{{ $order->order_number }}</td>
+                <td>{{ ucfirst($order->type) }}</td>
+                <td><span class="badge alert-primary">{{ ucwords($order->status) }}</span></td>
+                <td>{{ optional($order->order_date)->format('d M, Y') }}</td>
+                <td>{{ optional($order->due_date)->format('d M, Y') }}</td>
+                <td>{{ $order->party->name ?? '' }}</td>
+            </tr>
+        @endforeach
+
         </tbody>
     </table>
 </section>
@@ -59,23 +60,15 @@
             </tr>
         </thead>
         <tbody>
-            
+            @foreach($bills as $bill)
             <tr>
-                <td>
-                    
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>{{$bill->item_name}}</td>
+                <td>{{$bill->total_quantity}}</td>
+                <td>{{$bill->sent_quantity}}</td>
+                <td>{{$bill->rate}}</td>
+                <td>{{$bill->total_price}}</td>
             </tr>
-           
-            <tr class="fw-bold">
-                <td colspan="3"></td>
-                <td></td>
-                <td></td>
-            </tr>
-            
+            @endforeach
         </tbody>
     </table>
 </section>
@@ -85,156 +78,14 @@
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Narration
 </h6>
-<p class="p-3 border mb-4"></p>
+<p class="p-3 border mb-4">{{$bills['0']->narration}}</p>
 
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Whatsaap Narration
 </h6>
-<p class="p-3 border mb-4"></p>
-
-<h6 class="fw-bold mb-3">
-    <i class="fa fa-circle text-success me-1"></i>
-    Sale
-</h6>
-<section class="table-responsive rounded mb-2">
-    <table class="table table-bordered align-middle" style="min-width: 60rem;">
-        <thead>
-            <tr>
-                <th>Transaction No.</th>
-                <th>Type</th>
-                <th>Item</th>
-                <th>Quantity </th>
-                <th>Rate</th>
-                <th>Total</th>
-                <th> Date</th>
-                <th>Transport</th>
-            </tr>
-        </thead>
-        <tbody>
-           
-            <tr>
-                    <td colspan='3'></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td colspan='2'></td>
-                </tr>
-                
-
-            <tr>
-                
-                    <td rowspan="4">
-                        <input type="hidden" name="transaction_id" required value="">
-                        <button data-transaction="" data-toggle='modal' data-narration="" data-target="#narrationModal" class="btn btn-sm btn-success text-white me-1 narrationModal">Send whatsApp</button>
-                        <a target='_blank' href=""  class="btn btn-sm btn-success text-white me-1 ">Preview</a>
-                        <a href="" class="btn btn-sm btn-secondary">Edit</a>
-                    </td>
-                
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="p-0" style="max-width:10rem;text-align:center;">
-                    <i class='fa fa-folder openDetail' data-toggle='tooltip' data-placement='top'></i>
-                    <table class="table mb-0" style='display:none;'>
-                        <tbody>
-                            <tr>
-                                <th>Name--</th>
-                                <td class="border-start"></td>
-                            </tr>
-                            <tr>
-                                <th>Bilty No.</th>
-                                <td class="border-start"><img src="/images/" width="100" height="50px"></td>
-                            </tr>
-                            <tr>
-                                <th>Vehicle No.</th>
-                                <td class="border-start"></td>
-                            </tr>
-                            <tr style="border-bottom-color: transparent;">
-                                <th>Transport Date</th>
-                                <td class="border-start"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                   
-                </td>
-                {{-- <td> --}}
-                {{-- <form action="" method="POST">
-                @csrf
-                <input type="hidden" name="transcation_id" required value="">
-                <button type="submit" class="btn btn-sm btn-success text-white me-1">Send whatsApp</button>
-                </form> --}}
+<p class="p-3 border mb-4">{{$bills['0']->whats_app_narration}}</p>
 
 
-                {{-- </td> --}}
-            </tr>
-
-            <?php
-            /* $val_single = (float)$transaction->rate * (float)(abs($transaction->quantity));
-            $val_total_one += (float)$val_single;  */
-            ?>
-                <tr>
-                <td colspan='3'></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td colspan='2'></td>
-                </tr>
-            
-        </tbody>
-    </table>
-</section>
-
-
-<div class="modal" id="narrationModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <form action="" method="POST" class='pdf_form'>
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Narration</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    @csrf
-                    <input type="hidden" class="transaction_id" name="transaction_id" >
-                    <input type="hidden" class="show_preview" name="show_preview" >
-                    <div class="form-group">
-                        <textarea class="form-control narration_input" rows="8" placeholder="Enter Narration" name="narration"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Send</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<h6 class="fw-bold mb-3">
-    <i class="fa fa-circle text-success me-1"></i> Account Vouchers
-</h6>
-<section class="table-responsive rounded mb-5">
-    <table class="table table-bordered" style="min-width: 60rem;">
-        <thead>
-            <tr>
-                <th>Voucher Date</th>
-                <th>Amount</th>
-                <th>Narration</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
 </section>
 
 @push('scripts')
