@@ -423,17 +423,28 @@ class OrderController extends Controller
     }
 
     public function sale_bills(Request $request)
-    {
+    {   
+        
        
         if ($request->ajax()) {
 
-            $orders = Order::where('type', 'sale')
-            ->orderBy('id', 'desc')
-            ->with(['party'])
-            ->join('bills', 'bills.order_number', '=', 'orders.id') // Join the bills table
-            ->select('orders.*', 'bills.bill_id') // Select the order columns and the bill_id column
-            ->groupBy('bills.bill_id') // Group by bill_id to ensure each bill_id appears only once
-            ->get();
+            $bills = Bill::distinct('bill_id')->get(); // Retrieve all distinct bill_ids
+
+            $orders = collect(); // Initialize an empty collection to store orders
+
+            foreach ($bills as $bill) {
+                $ordersForBill = Order::where('type', 'sale')
+                    ->where('id', $bill->order_number)
+                    ->with(['party'])
+                    ->get();
+                
+                // Add bill_id to each order
+                foreach ($ordersForBill as $order) {
+                    $order->bill_id = $bill->bill_id;
+                }
+                
+                $orders = $orders->merge($ordersForBill); // Merge orders for each bill
+            }
 
            
             return DataTables::of($orders)
@@ -452,6 +463,9 @@ class OrderController extends Controller
                 })
                 ->editColumn('order_date', function ($order) {
                     return $order->order_date->format('d M, Y');
+                })
+                ->editColumn('party.name', function ($order) {
+                    return $order->party->name;
                 })
                 ->editColumn('due_date', function ($order) {
                     return $order->due_date->format('d M, Y');
@@ -703,8 +717,7 @@ public function fetch_purchase_item_details(Request $request)
         foreach($data as $bill){
             $orders = Order::where('id', $bill->order_number)->get();
         }
-echo "<pre>";
-print_r($orders);die;
+
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')
                         ->select('bills.*', 'items.name as item_name')
