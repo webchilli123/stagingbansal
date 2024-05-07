@@ -113,6 +113,7 @@ Route::middleware('auth')->group(function () {
     Route::get('fetch-item-details', [Controllers\OrderController::class, 'fetch_item_details'])->name('fetch.item.details');
     Route::get('fetch-purchase-item-details', [Controllers\OrderController::class, 'fetch_purchase_item_details'])->name('fetch.purchase.item.details');
     Route::post('bills-store', [Controllers\OrderController::class, 'storeBills'])->name('bills.store');
+    Route::post('bills-store', [Controllers\OrderController::class, 'storePurchaseBills'])->name('purchase.bills.store');
     Route::get('order-bill-prints', [Controllers\OrderController::class, 'bill_prints'])->name('order.bill.prints');
 
 

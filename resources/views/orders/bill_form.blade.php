@@ -20,10 +20,14 @@
     background-color: #fff;
     color: #000;
 }
+  
 
     
 </style>
+<div id="container-placeholder" >
+
 @csrf
+
 <section class="row">
 
 <div class="col-md-12 col-lg-6 mb-3">
@@ -55,21 +59,22 @@
 </div>
 
 
+
     
     
 </section>
 {{-- order items --}}
 @include('orders.bill-order-items')
 
-<footer class="d-flex justify-content-between mt-3 mt-lg-0 mb-4">
-    <button class="btn btn-primary" id="add-row">
-        <span class="fa fa-plus"></span>
-    </button>
-    <button class="btn btn-danger" id="remove-row">
-        <i class="fa fa-times"></i>
-    </button>
+    <!-- <footer class="d-flex justify-content-between mt-3 mt-lg-0 mb-4">
+        <button class="btn btn-primary" id="add-row">
+            <span class="fa fa-plus"></span>
+        </button>
+        <button class="btn btn-danger" id="remove-row">
+            <i class="fa fa-times"></i>
+        </button>
 
-</footer>
+    </footer> -->
 
 <div class="mb-3">
     <label for="" class="form-label">Narration</label>
@@ -82,7 +87,7 @@
 
 <button type="submit" class="btn btn-primary mb-5">{{ $mode == 'create' ? 'Save' : 'Update' }}</button>
 
-
+</div>
 @push('scripts')
 <!-- Include Select2 CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
@@ -91,7 +96,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <!-- Include Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script><script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
     function enableSelectize(){
        $('table#order tbody').find('select').selectize({ sortField: 'text' });
     }
@@ -226,13 +232,13 @@
         if(partyId !== ''){
             // Fetch orders for the selected party via AJAX
             $.ajax({
-                url: '{{ route('get.order.by.party') }}',
+                url: '{{ route('get.order') }}',
                 type: 'GET',
                 data: { partyId: partyId }, // Send partyId as data
                 success: function(response){
                     // Clear existing options
                     $('#orders').empty();
-
+                    $('#order tbody').empty();
                     // Append options for each order
                     $.each(response.orders, function (key, value) {
                         $('#orders').append(
@@ -278,7 +284,7 @@ function formatOrderSelection (order) {
     // Function to fetch item details based on selected order number
     function fetchItemDetails(orderNumber) {
     $.ajax({
-        url: '{{ route('fetch.purchase.item.details') }}',
+        url: '{{ route('fetch.item.details') }}',
         type: 'GET',
         data: { orderNumber: orderNumber }, // Send single order number
         success: function(response){
@@ -308,29 +314,88 @@ function formatOrderSelection (order) {
 
 
 function updateTableWithItemDetails(items) {
-    console.log("Updating table with item details:", items);
     var tableBody = $('#order tbody');
+    console.log("Updating table with item details:", items);
+    var existingRows = tableBody.find('tr');
 
-    // Clear existing rows
-    tableBody.empty();
-
-    // Loop through each item and add a row to the table
-    $.each(items, function(index, item) {
-        var row = '<tr>' +
-                      '<td>' + item.name + '</td>' +
-                      '<td><input type="number" class="form-control name="sent_quantity" received-quantity" value="' + item.received_quantity + '"></td>' +
-                      '<td>' + item.total_quantity + '</td>' +
-                      '<td>' + item.rate + '</td>' +
-                      '<td>' + item.total_price + '</td>' +
-                  '</tr>';
-        tableBody.append(row);
-    });
+    // Check if there are existing rows in the table
+    if (existingRows.length > 0) {
+        // Append new rows for the items to the existing table
+        $.each(items, function(index, item) {
+            var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
+            '<td>' + item.id + '</td>' + // Item ID
+            '<td>' + item.order_id + '</td>' + // Order ID
+            '<td>' + item.name + '</td>' +
+            '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
+            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.rate + '</td>' +
+            '<td>' + item.total_price + '</td>' +
+            '</tr>';
+            tableBody.append(row);
+        });
+    } else {
+        // If no existing rows, replace the table with new rows
+        var rows = ''; // String to hold HTML rows for all items
+        $.each(items, function(index, item) {
+            var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
+            '<td>' + item.id + '</td>' + // Item ID
+            '<td>' + item.order_id + '</td>' + // Order ID
+            '<td>' + item.name + '</td>' +
+            '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
+            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.rate + '</td>' +
+            '<td>' + item.total_price + '</td>' +
+            '</tr>';
+            rows += row; // Append current row to the rows string
+        });
+        tableBody.html(rows);
+    }
 }
-
-
-
-
 </script>
+
+<script>
+    $(document).ready(function() {
+        // Event listener for form submission
+        $('#bill-submit').submit(function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Extract data from the form
+            var formData = $(this).serialize();
+
+            // Extract table data and append it to the form data
+            var tableData = [];
+            $('#order tbody tr').each(function(index) {
+                var rowData = {};
+                $(this).find('td').each(function() {
+                    var fieldName = $(this).index();
+                    var fieldValue = $(this).text();
+                    rowData[fieldName] = fieldValue;
+                });
+                tableData.push(rowData);
+            });
+
+        formData += '&tableData=' + JSON.stringify(tableData);
+
+            // Now you can send the data to the controller using AJAX
+            $.ajax({
+                type: 'POST',
+                url: $(this).attr('action'),
+                data: formData,
+                success: function(response) {
+                    // Handle success response
+                    $('#container-placeholder').html(response.html);
+                    console.log(response.html);                    // Optionally, you can redirect the user to another page
+                    // window.location.href = '/success-page';
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response
+                    console.error('Error sending data:', error);
+                }
+            });
+        });
+    });
+</script>
+
 
 <script>
         $(document).ready(()=>{

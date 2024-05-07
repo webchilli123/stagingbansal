@@ -457,13 +457,14 @@ class OrderController extends Controller
 
 
     public function purchase_bills(Request $request)
-    {if ($request->ajax()) {
+    {
+        if ($request->ajax()) {
 
         $bills = Bill::with(['party'])
-        ->where('bill_type','purchase')
-        ->orderBy('id', 'DESC')
-        ->groupBy('bill_id')
-        ->get();
+                        ->where('bill_type','purchase')
+                        ->orderBy('id', 'DESC')
+                        ->groupBy('bill_id')
+                        ->get();
 
        
         return DataTables::of($bills)
@@ -483,7 +484,7 @@ class OrderController extends Controller
     }
 
     $parties = Party::orderBy('name')->pluck('name', 'id');
-    return view('orders.sale-bills', compact('parties'));}
+    return view('orders.purchase-bills', compact('parties'));}
 
     
     public function bill_purchase_create()
@@ -631,6 +632,55 @@ public function fetch_purchase_item_details(Request $request)
             $bill->bill_type = 'sale';
             $bill->party_id = $fields['party_id'];
            
+            $bill->save();
+            
+    
+        }
+
+        $bills = Bill::where('bill_id', $bill_id)
+                        ->join('items', 'items.id', '=', 'bills.item_number')
+                        ->select('bills.*', 'items.name as item_name')
+                        ->get();
+                                   
+                        
+        // Return the HTML content of the view
+        $viewContent = view('orders.bill-print', compact('bills','orders'))->render();
+
+        // Return response
+        return response()->json(['html' => $viewContent]);
+        
+    }
+
+    public function storePurchaseBills(Request $request)
+    {   
+        $fields = $request->all();
+        $orders = [];
+        foreach($fields['order_id'] as $order){
+            $order = Order::where('id', $order)->first();
+            if ($order) {
+                $orders[] = $order;
+            }
+        } 
+
+        $items = json_decode($fields['tableData']);
+        
+        $bill_id = 'purchase-' . rand(1111, 9999);
+
+        foreach($items as $data){
+
+            $bill = new Bill();
+            $bill->order_number = $data->{1}; 
+            $bill->item_number = $data->{0}; 
+            $bill->total_quantity = $data->{4};
+            $bill->sent_quantity = $data->{3};
+            $bill->rate = $data->{5}; 
+            $bill->total_price = $data->{6}; 
+            $bill->narration = $fields['narration'];
+            $bill->whats_app_narration = $fields['wa_narration'];
+            $bill->bill_id = $bill_id;
+            $bill->bill_type = 'purchase';
+            $bill->party_id = $fields['party_id'];
+
             $bill->save();
             
     

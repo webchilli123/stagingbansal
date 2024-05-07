@@ -6,7 +6,7 @@
     <a href="{{ route('order.purchase.bills') }}" class="btn btn-sm btn-secondary">Back</a>
 </header>
 
-<form action="{{ route('orders.store') }}" method="POST">
+<form id="bill-submit" action="{{ route('purchase.bills.store') }}" method="POST">
     @include('orders.bill_form', ['mode' => 'create'])
 </form>
 @endsection
