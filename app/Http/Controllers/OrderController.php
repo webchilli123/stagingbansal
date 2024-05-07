@@ -425,56 +425,28 @@ class OrderController extends Controller
     public function sale_bills(Request $request)
     {   
         
-       
+        
         if ($request->ajax()) {
 
-            $bills = Bill::distinct('bill_id')->get(); // Retrieve all distinct bill_ids
-
-            $orders = collect(); // Initialize an empty collection to store orders
-
-            foreach ($bills as $bill) {
-                $ordersForBill = Order::where('type', 'sale')
-                    ->where('id', $bill->order_number)
-                    ->with(['party'])
-                    ->get();
-                
-                // Add bill_id to each order
-                foreach ($ordersForBill as $order) {
-                    $order->bill_id = $bill->bill_id;
-                }
-                
-                $orders = $orders->merge($ordersForBill); // Merge orders for each bill
-            }
+            $bills = Bill::with(['party'])
+            ->where('bill_type','sale')
+            ->orderBy('id', 'DESC')
+            ->groupBy('bill_id')
+            ->get();
 
            
-            return DataTables::of($orders)
-                ->editColumn('bill_id', function ($order) {
-                    return ucfirst($order->bill_id);
+            return DataTables::of($bills)
+                ->editColumn('bill_id', function ($bill) {
+                    return ucfirst($bill->bill_id);
                 })
-                ->editColumn('order_number', function ($order) {
-                    return $order->type == ORDER::SALE
-                        ? "S-{$order->order_number}"
-                        : "P-{$order->order_number}";
+                ->editColumn('party_name', function ($bill) {
+                    return $bill->party_name;
                 })
-                ->editColumn('entry_type', function ($order) {
-                    return $order->entry_type == 1
-                        ? "Normal Sale"
-                        : "Direct Sale";
+                ->editColumn('created_at', function ($bill) {
+                    return $bill->created_at->format('d M, Y');
                 })
-                ->editColumn('order_date', function ($order) {
-                    return $order->order_date->format('d M, Y');
-                })
-                ->editColumn('party.name', function ($order) {
-                    return $order->party->name;
-                })
-                ->editColumn('due_date', function ($order) {
-                    return $order->due_date->format('d M, Y');
-                })
-                ->editColumn('status', function ($order) {
-                    return ucwords($order->status);
-                })
-                ->addColumn('action', function ($order) {
-                    return view('orders.bill-button')->with(['order' => $order]);
+                ->addColumn('action', function ($bill) {
+                    return view('orders.bill-button')->with(['order' => $bill]);
                 })
                 ->make(true);
         }
@@ -485,40 +457,33 @@ class OrderController extends Controller
 
 
     public function purchase_bills(Request $request)
-    {
-        if ($request->ajax()) {
+    {if ($request->ajax()) {
 
-            $orders = Order::where('type','purchase')->orderBy('id', 'desc')->with(['party'])->get();
+        $bills = Bill::with(['party'])
+        ->where('bill_type','purchase')
+        ->orderBy('id', 'DESC')
+        ->groupBy('bill_id')
+        ->get();
 
-            return DataTables::of($orders)
-                ->editColumn('order_number', function ($order) {
-                    return $order->type == ORDER::SALE
-                        ? "S-{$order->order_number}"
-                        : "P-{$order->order_number}";
-                })
-                ->editColumn('entry_type', function ($order) {
-                    return $order->entry_type == 1
-                        ? "Normal Sale"
-                        : "Direct Sale";
-                })
-                ->editColumn('order_date', function ($order) {
-                    return $order->order_date->format('d M, Y');
-                })
-                ->editColumn('due_date', function ($order) {
-                    return $order->due_date->format('d M, Y');
-                })
-                ->editColumn('status', function ($order) {
-                    return ucwords($order->status);
-                })
-                ->addColumn('action', function ($order) {
-                    return view('orders.bill-button')->with(['order' => $order]);
-                })
-                ->make(true);
-        }
-
-        $parties = Party::orderBy('name')->pluck('name', 'id');
-        return view('orders.purchase-bills', compact('parties'));
+       
+        return DataTables::of($bills)
+            ->editColumn('bill_id', function ($bill) {
+                return ucfirst($bill->bill_id);
+            })
+            ->editColumn('party_name', function ($bill) {
+                return $bill->party_name;
+            })
+            ->editColumn('created_at', function ($bill) {
+                return $bill->created_at->format('d M, Y');
+            })
+            ->addColumn('action', function ($bill) {
+                return view('orders.bill-button')->with(['order' => $bill]);
+            })
+            ->make(true);
     }
+
+    $parties = Party::orderBy('name')->pluck('name', 'id');
+    return view('orders.sale-bills', compact('parties'));}
 
     
     public function bill_purchase_create()
@@ -639,20 +604,24 @@ public function fetch_purchase_item_details(Request $request)
     public function storeBills(Request $request)
     {
         $fields = $request->all();
-        // echo "<pre>";
-        //     print_r($fields);die;
+        $orders = [];
         foreach($fields['order_id'] as $order){
-            $orders = Order::where('id',$order)->get();
+            $order = Order::where('id', $order)->first();
+            if ($order) {
+                $orders[] = $order;
+            }
         } 
+
         $items = json_decode($fields['tableData']);
+        
         $bill_id = 'sale-' . rand(1111, 9999);
 
         foreach($items as $data){
 
-            $bill = new bill();
-            $bill->order_number = $data->{0}; // Assuming item_id corresponds to the id field of stdClass object
-            $bill->item_number = $data->{1}; // Assuming name corresponds to the third element of stdClass object
-            $bill->total_quantity = $data->{4} - $data->{3};
+            $bill = new Bill();
+            $bill->order_number = $data->{1}; // Assuming item_id corresponds to the id field of stdClass object
+            $bill->item_number = $data->{0}; // Assuming name corresponds to the third element of stdClass object
+            $bill->total_quantity = $data->{4};
             $bill->sent_quantity = $data->{3};
             $bill->rate = $data->{5}; // Assuming item_id corresponds to the id field of stdClass object
             $bill->total_price = $data->{6}; // Assuming name corresponds to the third element of stdClass object
@@ -660,23 +629,19 @@ public function fetch_purchase_item_details(Request $request)
             $bill->whats_app_narration = $fields['wa_narration'];
             $bill->bill_id = $bill_id;
             $bill->bill_type = 'sale';
-
+            $bill->party_id = $fields['party_id'];
+           
             $bill->save();
-
-            $orderItem = OrderItem::where('item_id', $data->{1})->first();
-
-            if ($orderItem) {
-                $orderItem->decrement('ordered_quantity', $data->{3});
-            }
             
     
         }
+
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')
                         ->select('bills.*', 'items.name as item_name')
                         ->get();
-
-        
+                                   
+                        
         // Return the HTML content of the view
         $viewContent = view('orders.bill-print', compact('bills','orders'))->render();
 
@@ -713,10 +678,23 @@ public function fetch_purchase_item_details(Request $request)
     public function bill_prints(Request $request)
     {   
         $bill_id = $request->all();
-        $data = Bill::where('bill_id',$bill_id['order'])->get();
-        foreach($data as $bill){
-            $orders = Order::where('id', $bill->order_number)->get();
+        
+
+        $data = Bill::where('bill_id', $bill_id['order'])
+            ->orderBy('id', 'DESC')
+            ->groupBy('order_number')
+            ->get();
+
+        $orders = [];
+
+        foreach ($data as $bill) {
+            $order = Order::where('id', $bill->order_number)->first();
+            if ($order) {
+                $orders[] = $order;
+            }
         }
+
+        
 
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')

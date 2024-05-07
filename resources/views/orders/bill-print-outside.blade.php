@@ -81,7 +81,7 @@
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Narration
 </h6>
-<p class="p-3 border mb-4"> </p>
+<p class="p-3 border mb-4">{{$bills['0']->narration}} </p>
 
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Whatsaap Narration

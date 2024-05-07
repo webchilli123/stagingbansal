@@ -11,19 +11,15 @@
 @include('orders.accordion-bills')
 
 <section class="table-responsive-sm rounded mb-5">
-  <table class="table table-striped table-borderless border" id="orders">
+  <table class="table table-striped table-borderless border" id="bills">
     <thead>
       <tr>
         <th></th>
-        <th>Id</th>
+        <th></th>
         <th>Bill ID</th>
+        <th>Party Name</th>
+        <th>Created  On</th>
         <th></th>
-        <th>Status</th>
-        <th>Order Date</th>
-        <th>Due Date</th>
-        <th>Party</th>
-        <th></th>
-        <th>Entry Type</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -40,7 +36,7 @@
 
        $('select').selectize();
 
-       let table = $('table#orders').DataTable({
+       let table = $('table#bills').DataTable({
               processing: true,
               serverSide: true,
               order: [[5,'desc']],
@@ -56,13 +52,9 @@
                   }, 
                   { data: 'id', visible: false, searchable: false },
                   { data: 'bill_id', name: 'bill_id' },
-                  { data: 'type', name: 'type', visible: false },
-                  { data: 'status', name: 'status' },
-                  { data: 'order_date', name: 'order_date' },
-                  { data: 'due_date', name: 'due_date' },
                   { data: 'party.name', name: 'party.name'},
+                  { data: 'created_at', name: 'created_at' },
                   { data: 'party_id', name: 'party_id', visible: false },
-                  { data: 'entry_type', name: 'entry_type'},
                   { data: 'action', 'orderable': false, searchable: false,}
               ],
           });
