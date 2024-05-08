@@ -36,7 +36,6 @@ class ItemwisestockCntroller extends Controller
                 ->whereNotIn('party_id', [4029,1001])
                 ->orderBy('created_at','desc')
                 ->paginate(500);
-                dd($transactions);
                 
                     $transactions = $this->_group_by($transactions,'party_id');   
                 if(!empty($transactions)){
