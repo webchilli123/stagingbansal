@@ -16,7 +16,7 @@
         <th>Name</th>
         <th>Company Name</th>
         <th>Tax Rate</th>
-        <th>Quantity</th>
+        <th>Opening Stock</th>
         <th>Actions</th>
       </tr>
     </thead>

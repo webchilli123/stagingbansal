@@ -33,7 +33,7 @@
 <div class="col-md-12 col-lg-6 mb-3">
     <label for="party" class="form-label">Party</label>
     <div class="input-group">
-        <select name="party_id" id="party" class="form-control" required>
+        <select name="party_id" id="party" class="form-control select-single" required>
             @if (isset($order))
                 @foreach($parties as $id => $party)
                     <option {{ $order->party_id == $id ? 'selected' : '' }} value="{{ $id }}">
@@ -97,6 +97,17 @@
 
 <!-- Include Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for party dropdown
+        $('#party').select2({
+            placeholder: "Select a party",
+        });
+
+        // Initialize Select2 for orders dropdown
+       
+    });
+</script>
 <script>
     function enableSelectize(){
        $('table#order tbody').find('select').selectize({ sortField: 'text' });
@@ -219,8 +230,8 @@
     $(document).ready(function(){
     // Initialize Select2
     $('#orders').select2({
-        placeholder: "-- Select Order --",
-        allowClear: true,
+        placeholder: "Select orders",
+        multiple: true,
         templateResult: formatOrder,
         templateSelection: formatOrderSelection
     });
@@ -248,8 +259,8 @@
 
                     // Refresh Select2 to update options
                     $('#orders').select2({
-                        placeholder: "-- Select Order --",
-                        allowClear: true,
+                        placeholder: "Select orders",
+                        multiple: true,
                         templateResult: formatOrder,
                         templateSelection: formatOrderSelection
                     });

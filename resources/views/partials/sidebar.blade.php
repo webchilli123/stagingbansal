@@ -118,9 +118,7 @@ body{
                 <a href="{{ route('orders.index') }}" class="list-group-item list-group-item-action border-0">
                     <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Normal Orders
                 </a>
-                <a href="{{ route('direct.sale.listing') }}" class="list-group-item list-group-item-action border-0">
-                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Direct Orders
-                </a>
+                
             </div>
         </div>
         @endcan
@@ -143,6 +141,9 @@ body{
                 </a>
                 <a href="{{ route('order.purchase.bills') }}" class="list-group-item list-group-item-action border-0">
                     <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Purchase Bills
+                </a>
+                <a href="{{ route('direct.sale.listing') }}" class="list-group-item list-group-item-action border-0">
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Direct Bill
                 </a>
                 
             </div>

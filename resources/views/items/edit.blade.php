@@ -16,7 +16,7 @@
             <input type="text" class="form-control" id="name" name="name" value="{{ $item->name }}" required>
         </div>
         <div class="col-md-6">
-            <label for="quantity" class="form-label">Quantity</label>
+            <label for="quantity" class="form-label">Opening Stock</label>
             <input type="text" class="form-control" id="quantity" name="quantity" value="{{ $item->quantity }}" required>
         </div>
     </div>
