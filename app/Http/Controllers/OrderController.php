@@ -508,7 +508,7 @@ class OrderController extends Controller
 
         // Fetch orders associated with the specified partyId
         $orders = Order::where('party_id', $partyId)
-                        ->where('type', 'purchase')
+                        // ->where('type', 'purchase')
                         ->where(function ($query) {
                             $query->where('status', 'pending')
                                 ->orWhere('status', 'incomplete');
@@ -544,24 +544,23 @@ class OrderController extends Controller
 
     if ($order) {
         // Fetch all item details associated with the order
-        $orderItems = OrderItem::where('order_id', $orderNumber)->get();
+        $orderItems = OrderItem::with('item:id,name')->where('order_id', $orderNumber)->get();
 
         // Array to hold item details
         $items = [];
 
         // Loop through each order item and fetch the item details
-        foreach ($orderItems as $orderItem) {
-            $item = $orderItem->item; // Access the related item
-            if ($item) {
-                // Include the order ID in the item details
-                $order_id = $orderItem->order_id;
-                $item->order_id = $order_id;
-                $items[] = $item;
-            }
-        }
-
+        // foreach ($orderItems as $orderItem) {
+        //     $item = $orderItem->item; // Access the related item
+        //     if ($item) {
+        //         // Include the order ID in the item details
+        //         $order_id = $orderItem->order_id;
+        //         $item->order_id = $order_id;
+        //         $items[] = $item;
+        //     }
+        // }
         // Return item details as JSON response
-        return response()->json(['items' => $items]);
+        return response()->json(['items' => $orderItems]);
     } else {
         // Order not found, return empty response or appropriate error message
         return response()->json(['message' => 'Order not found'], 404);

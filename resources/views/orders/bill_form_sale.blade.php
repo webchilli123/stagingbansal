@@ -337,9 +337,9 @@ function updateTableWithItemDetails(items) {
             var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
             '<td>' + item.id + '</td>' + // Item ID
             '<td>' + item.order_id + '</td>' + // Order ID
-            '<td>' + item.name + '</td>' +
+            '<td>' + item.item.name + '</td>' +
             '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
-            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.ordered_quantity + '</td>' +
             '<td>' + item.rate + '</td>' +
             '<td>' + item.total_price + '</td>' +
             '</tr>';
@@ -352,9 +352,9 @@ function updateTableWithItemDetails(items) {
             var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
             '<td>' + item.id + '</td>' + // Item ID
             '<td>' + item.order_id + '</td>' + // Order ID
-            '<td>' + item.name + '</td>' +
+            '<td>' + item.item.name + '</td>' +
             '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
-            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.ordered_quantity + '</td>' +
             '<td>' + item.rate + '</td>' +
             '<td>' + item.total_price + '</td>' +
             '</tr>';
