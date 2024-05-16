@@ -603,6 +603,7 @@ public function fetch_purchase_item_details(Request $request)
 
     public function storeBills(Request $request)
     {
+        
         $fields = $request->all();
         $orders = [];
         foreach($fields['order_id'] as $order){

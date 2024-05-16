@@ -409,12 +409,4 @@ function updateTableWithItemDetails(items) {
 </script>
 
 
-<script>
-        $(document).ready(()=>{
-        $('select').selectize({
-            plugins: ["remove_button"],
-        });
-    });
-    </script>
-
 @endpush
