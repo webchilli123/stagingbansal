@@ -317,11 +317,29 @@ function formatOrderSelection (order) {
     // Event listener for order selection
     $(document).on('change', '#orders', function(){
         
-        var selectedOrderNumber = $(this).val();
-        if(selectedOrderNumber) {
-            fetchItemDetails(selectedOrderNumber);
-        }
+        var selectedOrderNumbers = $(this).val();
+    if(selectedOrderNumbers && selectedOrderNumbers.length > 0) {
+        fetchItemDetails(selectedOrderNumbers);
+    } else {
+        // If no order is selected, clear the table
+        $('#order tbody').empty();
+    }
     });
+
+    $(document).on('select2:unselecting', '#orders', function(e) {
+    var removedOrderNumber = e.params.args.data.id;
+    var selectedOrderNumbers = $(this).val();
+    var index = selectedOrderNumbers.indexOf(removedOrderNumber);
+    if (index !== -1) {
+        selectedOrderNumbers.splice(index, 1);
+    }
+    if (selectedOrderNumbers && selectedOrderNumbers.length > 0) {
+        fetchItemDetails(selectedOrderNumbers);
+    } else {
+        // If no order is selected, clear the table
+        $('#order tbody').empty();
+    }
+});
 });
 
 
@@ -342,6 +360,7 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.ordered_quantity + '</td>' +
             '<td>' + item.rate + '</td>' +
             '<td>' + item.total_price + '</td>' +
+            '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
             tableBody.append(row);
         });
@@ -357,12 +376,16 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.ordered_quantity + '</td>' +
             '<td>' + item.rate + '</td>' +
             '<td>' + item.total_price + '</td>' +
+            '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
             rows += row; // Append current row to the rows string
         });
         tableBody.html(rows);
     }
 }
+$(document).on('click', '.remove-item', function(){
+    $(this).closest('tr').remove(); // Remove the closest row when the remove button is clicked
+});
 </script>
 
 <script>

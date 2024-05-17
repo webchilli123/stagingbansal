@@ -9,6 +9,9 @@
                 <th>Total Quantity (Kg)</th>
                 <th>Rate</th>
                 <th>Total Price</th>
+                <th>
+                    <i class="fas fa-ellipsis-h text-secondary action-dropdown"></i>
+                </th>
             </tr>
         </thead>
         <tbody>

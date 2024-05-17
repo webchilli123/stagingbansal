@@ -423,8 +423,7 @@ class OrderController extends Controller
     }
 
     public function sale_bills(Request $request)
-    {   
-        
+    {  
         
         if ($request->ajax()) {
 
