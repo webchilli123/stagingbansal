@@ -604,6 +604,7 @@ public function fetch_purchase_item_details(Request $request)
     {
         
         $fields = $request->all();
+        
         $orders = [];
         foreach($fields['order_id'] as $order){
             $order = Order::where('id', $order)->first();
@@ -624,7 +625,7 @@ public function fetch_purchase_item_details(Request $request)
             $bill->total_quantity = $data->{4};
             $bill->sent_quantity = $data->{3};
             $bill->rate = $data->{5}; // Assuming item_id corresponds to the id field of stdClass object
-            $bill->total_price = $data->{6}; // Assuming name corresponds to the third element of stdClass object
+            $bill->total_price = $data->{3} * $data->{5}; // Assuming name corresponds to the third element of stdClass object
             $bill->narration = $fields['narration'];
             $bill->whats_app_narration = $fields['wa_narration'];
             $bill->bill_id = $bill_id;
@@ -636,6 +637,11 @@ public function fetch_purchase_item_details(Request $request)
     
         }
 
+        $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
+                ->groupBy('order_number')
+                ->where('bill_id',$bill_id)
+                ->get();
+
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')
                         ->select('bills.*', 'items.name as item_name')
@@ -643,7 +649,7 @@ public function fetch_purchase_item_details(Request $request)
                                    
                         
         // Return the HTML content of the view
-        $viewContent = view('orders.bill-print', compact('bills','orders'))->render();
+        $viewContent = view('orders.bill-print', compact('bills','orders','totals'))->render();
 
         // Return response
         return response()->json(['html' => $viewContent]);
@@ -673,7 +679,7 @@ public function fetch_purchase_item_details(Request $request)
             $bill->total_quantity = $data->{4};
             $bill->sent_quantity = $data->{3};
             $bill->rate = $data->{5}; 
-            $bill->total_price = $data->{6}; 
+            $bill->total_price = $data->{3} * $data->{5}; 
             $bill->narration = $fields['narration'];
             $bill->whats_app_narration = $fields['wa_narration'];
             $bill->bill_id = $bill_id;
@@ -685,6 +691,11 @@ public function fetch_purchase_item_details(Request $request)
     
         }
 
+        $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
+                ->groupBy('order_number')
+                ->where('bill_id',$bill_id)
+                ->get();
+
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')
                         ->select('bills.*', 'items.name as item_name')
@@ -692,7 +703,7 @@ public function fetch_purchase_item_details(Request $request)
                                    
                         
         // Return the HTML content of the view
-        $viewContent = view('orders.bill-print', compact('bills','orders'))->render();
+        $viewContent = view('orders.bill-print', compact('bills','orders','totals'))->render();
 
         // Return response
         return response()->json(['html' => $viewContent]);
@@ -743,7 +754,10 @@ public function fetch_purchase_item_details(Request $request)
             }
         }
 
-        
+        $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
+                ->groupBy('order_number')
+                ->where('bill_id',$bill_id['order'])
+                ->get();
 
         $bills = Bill::where('bill_id', $bill_id)
                         ->join('items', 'items.id', '=', 'bills.item_number')
@@ -752,6 +766,6 @@ public function fetch_purchase_item_details(Request $request)
   
         // dd($order);
 
-        return view('orders.bill-print-outside', compact('bills','orders'));
+        return view('orders.bill-print-outside', compact('bills','orders','totals'));
     }
 }

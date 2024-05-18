@@ -404,6 +404,10 @@ $(document).on('click', '.remove-item', function(){
                 $(this).find('td').each(function() {
                     var fieldName = $(this).index();
                     var fieldValue = $(this).text();
+                    // Check if the field is an input element
+                    if ($(this).find('input').length > 0) {
+                        fieldValue = $(this).find('input').val(); // Get input field value
+                    }
                     rowData[fieldName] = fieldValue;
                 });
                 tableData.push(rowData);

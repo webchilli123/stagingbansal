@@ -377,7 +377,7 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.total_price + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
-            rows += row; // Append current row to the rows string
+            rows += row; // Append current row  to the rows string
         });
         tableBody.html(rows);
     }
@@ -404,6 +404,10 @@ $(document).on('click', '.remove-item', function(){
                 $(this).find('td').each(function() {
                     var fieldName = $(this).index();
                     var fieldValue = $(this).text();
+                    // Check if the field is an input element
+                    if ($(this).find('input').length > 0) {
+                        fieldValue = $(this).find('input').val(); // Get input field value
+                    }
                     rowData[fieldName] = fieldValue;
                 });
                 tableData.push(rowData);
