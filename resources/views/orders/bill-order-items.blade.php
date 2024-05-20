@@ -6,8 +6,9 @@
                 <th>Order ID</th>
                 <th>Item</th>
                 <th>Sent Quantity</th>
-                <th>Total Quantity (Kg)</th>
                 <th>Rate</th>
+                <th>Order Price</th>
+                <th>Total Quantity (Kg)</th>
                 <th>Total Price</th>
                 <th>
                     <i class="fas fa-ellipsis-h text-secondary action-dropdown"></i>

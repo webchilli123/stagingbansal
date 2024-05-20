@@ -354,10 +354,11 @@ function updateTableWithItemDetails(items) {
             var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
             '<td>' + item.id + '</td>' + // Item ID
             '<td>' + item.order_id + '</td>' + // Order ID
-            '<td>' + item.name + '</td>' +
-            '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
-            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.item.name + '</td>' +
+            '<td><input type="number" class="form-control received-quantity" value=""></td>' +
             '<td>' + item.rate + '</td>' +
+            '<td class="order-price"></td>' + // Leave order price cell empty initially
+            '<td>' + item.ordered_quantity + '</td>' +
             '<td>' + item.total_price + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
@@ -370,19 +371,27 @@ function updateTableWithItemDetails(items) {
             var row = '<tr data-item-id="' + item.id + '" data-order-id="' + item.order_id + '">' +
             '<td>' + item.id + '</td>' + // Item ID
             '<td>' + item.order_id + '</td>' + // Order ID
-            '<td>' + item.name + '</td>' +
-            '<td><input type="number" class="form-control received-quantity" value="' + item.received_quantity + '"></td>' +
-            '<td>' + item.total_quantity + '</td>' +
+            '<td>' + item.item.name + '</td>' +
+            '<td><input type="number" class="form-control received-quantity" value=""></td>' +
             '<td>' + item.rate + '</td>' +
+            '<td class="order-price"></td>' + // Leave order price cell empty initially
+            '<td>' + item.ordered_quantity + '</td>' +
             '<td>' + item.total_price + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
-            rows += row; // Append current row  to the rows string
+            rows += row; // Append current row to the rows string
         });
         tableBody.html(rows);
     }
-}
 
+    // Attach event listener to dynamically calculate order price
+    tableBody.on('input', '.received-quantity', function() {
+        var receivedQuantity = parseFloat($(this).val());
+        var rate = parseFloat($(this).closest('tr').find('td:eq(4)').text()); // Assuming rate is always in the fifth column (index 4)
+        var orderPrice = receivedQuantity * rate;
+        $(this).closest('tr').find('.order-price').text(orderPrice.toFixed(2));
+    });
+}
 $(document).on('click', '.remove-item', function(){
     $(this).closest('tr').remove(); // Remove the closest row when the remove button is clicked
 });

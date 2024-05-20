@@ -622,10 +622,10 @@ public function fetch_purchase_item_details(Request $request)
             $bill = new Bill();
             $bill->order_number = $data->{1}; // Assuming item_id corresponds to the id field of stdClass object
             $bill->item_number = $data->{0}; // Assuming name corresponds to the third element of stdClass object
-            $bill->total_quantity = $data->{4};
+            $bill->total_quantity = $data->{6};
             $bill->sent_quantity = $data->{3};
-            $bill->rate = $data->{5}; // Assuming item_id corresponds to the id field of stdClass object
-            $bill->total_price = $data->{3} * $data->{5}; // Assuming name corresponds to the third element of stdClass object
+            $bill->rate = $data->{4}; // Assuming item_id corresponds to the id field of stdClass object
+            $bill->total_price = $data->{3} * $data->{4}; // Assuming name corresponds to the third element of stdClass object
             $bill->narration = $fields['narration'];
             $bill->whats_app_narration = $fields['wa_narration'];
             $bill->bill_id = $bill_id;
@@ -676,10 +676,10 @@ public function fetch_purchase_item_details(Request $request)
             $bill = new Bill();
             $bill->order_number = $data->{1}; 
             $bill->item_number = $data->{0}; 
-            $bill->total_quantity = $data->{4};
+            $bill->total_quantity = $data->{6};
             $bill->sent_quantity = $data->{3};
-            $bill->rate = $data->{5}; 
-            $bill->total_price = $data->{3} * $data->{5}; 
+            $bill->rate = $data->{4}; 
+            $bill->total_price = $data->{3} * $data->{4}; 
             $bill->narration = $fields['narration'];
             $bill->whats_app_narration = $fields['wa_narration'];
             $bill->bill_id = $bill_id;
