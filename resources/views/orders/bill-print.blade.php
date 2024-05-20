@@ -78,17 +78,17 @@
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Narration
 </h6>
-<p class="p-3 border mb-4">{{$bills['0']->narration}}</p>
+<p class="p-3 border mb-4">{{$bills[0]->narration ?? ''}}</p>
 
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Whatsaap Narration
 </h6>
-<p class="p-3 border mb-4">{{$bills['0']->whats_app_narration}}</p>
+<p class="p-3 border mb-4">{{$bills[0]->whats_app_narration ?? ''}}</p>
 
-@if($bill->count() > 0)
+@if($bills->count() > 0)
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i>
-    {{ $bills['0']->bill_type == 'sale' ? 'Sales' : 'Purchases' }}
+    {{ $bills[0]->bill_type == 'sale' ? 'Sales' : 'Purchases' }}
 </h6>
 <section class="table-responsive rounded mb-2">
     <table class="table table-bordered align-middle" style="min-width: 60rem;">
