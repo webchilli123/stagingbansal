@@ -26,23 +26,17 @@
             <tr>
                 <th>Order No.</th>
                 <th>Type</th>
-                <th>Status</th>
                 <th>Order Date</th>
-                <th>Due Date</th>
                 <th>Party Name</th>
             </tr>
         </thead>
         <tbody>
-        @foreach($orders as $order)
-            <tr>
-                <td>{{ $order->order_number }}</td>
-                <td>{{ ucfirst($order->type) }}</td>
-                <td><span class="badge alert-primary">{{ ucwords($order->status) }}</span></td>
-                <td>{{ optional($order->order_date)->format('d M, Y') }}</td>
-                <td>{{ optional($order->due_date)->format('d M, Y') }}</td>
-                <td>{{ $order->party->name ?? '' }}</td>
-            </tr>
-        @endforeach
+        <tr>
+            <td>{{ $bills->bill_id }}</td>
+            <td>{{ ucfirst($bills->bill_type) }}</td>
+            <td>{{ date('d M, Y', strtotime($bills->created_at)) }}</td>
+            <td>{{ $bills->party ? $bills->party->name : '' }}</td>
+        </tr>
 
         </tbody>
     </table>
@@ -63,13 +57,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($bills as $bill)
+            @foreach($bills->billItems as $item)
             <tr>
-                <td>{{$bill->item_name}}</td>
-                <td>{{$bill->total_quantity}}</td>
-                <td>{{$bill->sent_quantity}}</td>
-                <td>{{$bill->rate}}</td>
-                <td>{{$bill->total_price}}</td>
+                <td>{{$item->item}}</td>
+                <td>{{$item->order_quantity}}</td>
+                <td>{{$item->sent_quantity}}</td>
+                <td>{{$item->rate}}</td>
+                <td>{{$item->price}}</td>
             </tr>
             @endforeach
         </tbody>
@@ -81,55 +75,14 @@
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Narration
 </h6>
-<p class="p-3 border mb-4">{{$bills['0']->narration}} </p>
+<p class="p-3 border mb-4">{{$bills->narration ?? ''}} </p>
 
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Whatsaap Narration
 </h6>
-<p class="p-3 border mb-4">{{$bills['0']->whats_app_narration}}</p>
+<p class="p-3 border mb-4">{{$bills->whats_app_narration ?? ''}}</p>
 
 
-@if($bill->count() > 0)
-<h6 class="fw-bold mb-3">
-    <i class="fa fa-circle text-success me-1"></i>
-    {{ $bills['0']->bill_type == 'sale' ? 'Sales' : 'Purchases' }}
-</h6>
-<section class="table-responsive rounded mb-2">
-    <table class="table table-bordered align-middle" style="min-width: 60rem;">
-        <thead>
-            <tr>
-                <th>Transaction No.</th>
-                <th>Type</th>
-                <th>Item</th>
-                <th>Quantity ({{ $bills['0']->bill_type == 'sale' ? 'Sent' : 'Received' }})</th>
-                <th>Rate</th>
-                <th>Total</th>
-                <th>{{ $bills['0']->bill_type == 'sale' ? 'Sale' : 'Purchase' }} Date</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($bills as $index => $bill)
-    <tr>
-    <td>{!! $index === 0 ? '<input type="hidden" name="transaction_id" required value="">
-                        <button data-transaction="" data-toggle="modal" data-narration="" data-target="" class="btn btn-sm btn-success text-white me-1 narrationModal">Send WhatsApp</button>
-                        <a target="_blank" href=""  class="btn btn-sm btn-success text-white me-1">Preview</a>' : '' !!}
-</td>
-
-        <td>{{ucfirst($bill->bill_type)}}</td>
-        <td>{{$bill->item_name}}</td>
-        <td>{{$bill->sent_quantity}}</td>
-        <td>{{$bill->rate}}</td>
-        <td>{{$bill->total_price}}</td>
-        <td>{{ optional($bill->created_at)->format('d M, Y') }}</td>
-    </tr>
-@endforeach
-
-
-        </tbody>
-    </table>
-</section>
-
-@endif
 
 <div class="modal" id="narrationModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -172,19 +125,16 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($totals as $total)
             <tr>
-                <td></td>
-                <td>{{number_format($total->total_product_amount,2) ?? 0}}</td>
-                <td>Order No. {{ $total->order_number }}</td>
+                <td>{{ date('d M, Y', strtotime($bills->created_at)) }}</td>
+                <td>{{number_format($totals,2) ?? 0}}</td>
+                <td> {{ $bills->narration }}</td>
             </tr>
-            @endforeach
         </tbody>
     </table>
 </section>
 
 @endif
-@if(count($totals)>1)
 <h6 class="fw-bold mb-3">
     <i class="fa fa-circle text-success me-1"></i> Total Amount
 </h6>
@@ -196,19 +146,12 @@
             </tr>
         </thead>
         <tbody>
-            <?php 
-            $total_amount = 0;
-            foreach($totals as $total):
-                $total_amount += $total->total_product_amount;
-            endforeach;
-            ?>
             <tr>
-                <td>{{ number_format($total_amount, 2) }}</td>
+                <td>{{ number_format($totals, 2) }}</td>
             </tr>
         </tbody>
     </table>
 </section>
-@endif
 
 @endsection
 

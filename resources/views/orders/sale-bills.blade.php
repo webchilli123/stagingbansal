@@ -4,7 +4,7 @@
 <header class="d-flex justify-content-between align-items-center mb-4">
   <h5>Sale Bills</h5>
   @can('create', App\Models\Order::class)
-    <a href="{{ route('bill.sale.create') }}" class="btn btn-primary">Order</a>
+    <a href="{{ route('bill.sale.create') }}" class="btn btn-primary">Create Sale Bill</a>
   @endcan
 </header>
 
@@ -41,7 +41,7 @@
               serverSide: true,
               order: [[5,'desc']],
               responsive:{ details: false },
-              ajax : '{{ route('order.sale.bills') }}',
+              ajax : '{{ route("order.sale.bills") }}',
               columns: [
                   {
                     className: 'details-control',

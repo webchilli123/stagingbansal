@@ -32,7 +32,7 @@
       <!--   <th>Date</th> -->
         <th>#</th>
         <th>Item Name</th>
-        <th>Op Stock</th>
+        <th>Opening Balance</th>
         <th>Receive(DR)</th>
         <th>Send(CR)</th>
         <th>Wastage</th>

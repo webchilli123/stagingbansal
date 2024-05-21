@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Str;
 use App\Http\Requests\OrderRequest;
+use App\Models\BillItem;
 use App\Models\OrderItem;
 use App\Models\Transaction;
 use App\Models\Transport;
@@ -430,7 +431,6 @@ class OrderController extends Controller
             $bills = Bill::with(['party'])
             ->where('bill_type','sale')
             ->orderBy('id', 'DESC')
-            ->groupBy('bill_id')
             ->get();
 
            
@@ -449,8 +449,8 @@ class OrderController extends Controller
                 })
                 ->make(true);
         }
-
         $parties = Party::orderBy('name')->pluck('name', 'id');
+
         return view('orders.sale-bills', compact('parties'));
     }
 
@@ -507,7 +507,7 @@ class OrderController extends Controller
 
         // Fetch orders associated with the specified partyId
         $orders = Order::where('party_id', $partyId)
-                        // ->where('type', 'purchase')
+                        ->where('type', 'purchase')
                         ->where(function ($query) {
                             $query->where('status', 'pending')
                                 ->orWhere('status', 'incomplete');
@@ -602,7 +602,6 @@ public function fetch_purchase_item_details(Request $request)
 
     public function storeBills(Request $request)
     {
-        
         $fields = $request->all();
         
         $orders = [];
@@ -612,42 +611,120 @@ public function fetch_purchase_item_details(Request $request)
                 $orders[] = $order;
             }
         } 
-
         $items = json_decode($fields['tableData']);
         
-        $bill_id = 'sale-' . rand(1111, 9999);
+        $bill_id = 'sale_bill-' . rand(1111, 9999);
 
-        foreach($items as $data){
+        $bill = Bill::create([
+            'bill_id' => $bill_id,
+            'bill_type' => 'sale',
+            'party_id' => $request->party_id,
+            'narration' => $request->narration,
+            'whats_app_narration' => $request->whats_app_narration,
+        ]);
 
-            $bill = new Bill();
-            $bill->order_number = $data->{1}; // Assuming item_id corresponds to the id field of stdClass object
-            $bill->item_number = $data->{0}; // Assuming name corresponds to the third element of stdClass object
-            $bill->total_quantity = $data->{6};
-            $bill->sent_quantity = $data->{3};
-            $bill->rate = $data->{4}; // Assuming item_id corresponds to the id field of stdClass object
-            $bill->total_price = $data->{3} * $data->{4}; // Assuming name corresponds to the third element of stdClass object
-            $bill->narration = $fields['narration'];
-            $bill->whats_app_narration = $fields['wa_narration'];
-            $bill->bill_id = $bill_id;
-            $bill->bill_type = 'sale';
-            $bill->party_id = $fields['party_id'];
+        if($bill){
+            foreach($items as $item){
+                BillItem::create([
+                    'bill_id' => $bill->id,
+                    'item_id' => $item->{0},
+                    'order_id' => $item->{1},
+                    'item' => $item->{2},
+                    'sent_quantity' => $item->{3},
+                    'rate' => $item->{4},
+                    'price' => $item->{5},
+                    'order_quantity' => $item->{6},
+                    'order_price' => $item->{7},
+                ]);
+            }
+
+            $tr = Transaction::create([
+                'transaction_date' => Carbon::now(),
+                'type' => 'acc',
+                'creditor_id' => $request->party_id,
+                'debitor_id' => Party::SALE,
+                // 'amt_credit' => $this->arraySum($request->total_prices),
+                'narration' => $request->narration,
+                'wa_narration' => $request->wa_narration,
+                'transaction_number' => Transaction::transactionNumber(),
+                'order_id' => implode(',',$request->order_id),
+                'transaction_date' => Carbon::now(),
+                'is_paid' => 1
+            ]);
+    
+            $tr = Transaction::create([
+                'transaction_date' => Carbon::now(),
+                'type' => 'acc',
+                'creditor_id' => Party::SALE,
+                'debitor_id' => $request->party_id,
+                // 'amt_credit' => $this->arraySum($request->total_prices),
+                'narration' => $order->narration,
+                'wa_narration' => $order->wa_narration,
+                'transaction_number' => Transaction::transactionNumber(),
+                'order_id' => implode(',',$request->order_id),
+                'transaction_date' => Carbon::now(),
+                'is_paid' => 1
+            ]);
+        }
+        // foreach($items as $data){
+
+        //     $bill = new Bill();
+        //     $bill->order_number = $data->{1}; // Assuming item_id corresponds to the id field of stdClass object
+        //     $bill->item_number = $data->{0}; // Assuming name corresponds to the third element of stdClass object
+        //     $bill->total_quantity = $data->{6};
+        //     $bill->sent_quantity = $data->{3};
+        //     $bill->rate = $data->{4}; // Assuming item_id corresponds to the id field of stdClass object
+        //     $bill->total_price = $data->{3} * $data->{4}; // Assuming name corresponds to the third element of stdClass object
+        //     $bill->narration = $fields['narration'];
+        //     $bill->whats_app_narration = $fields['wa_narration'];
+        //     $bill->bill_id = $bill_id;
+        //     $bill->bill_type = 'sale';
+        //     $bill->party_id = $fields['party_id'];
            
-            $bill->save();
+        //     $bill->save();
             
     
-        }
+        // }
 
-        $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
-                ->groupBy('order_number')
-                ->where('bill_id',$bill_id)
-                ->get();
+        
 
-        $bills = Bill::where('bill_id', $bill_id)
-                        ->join('items', 'items.id', '=', 'bills.item_number')
-                        ->select('bills.*', 'items.name as item_name')
-                        ->get();
-                                   
-                        
+            // foreach ($request->items ?? [] as $i => $item_id) {
+
+            //     $orderItem = Order::find($item_id);
+
+            //     // return $orderItem->increment('received_quantity', $request->current_quantities[$i]);
+
+
+            //     TransferTransaction::create([
+            //         'item_id' => $orderItem->id,
+            //         'party_id' => $request->party_id ?? Party::SELF_STORE,
+            //         'order_id' => $order->id,
+            //         // 'quantity' => $order->quantity,
+            //         'rate' => '',
+            //         'type' => Order::SALE,
+            //         'transport_id' => $request->transport_id ?? null,
+            //         'bilty_number' => $request->bilty_number ?? null,
+            //         'vehicle_number' => $request->vehicle_number ?? null,
+            //         'transport_date' => $request->transport_date ?? null,
+            //         'transaction_id' => $tr->transaction_number ?? null,
+            //         'created_at' => Carbon::now()
+            //     ]);
+            // }
+        
+
+        // $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
+        //         ->groupBy('order_number')
+        //         ->where('bill_id',$bill_id)
+        //         ->get();
+
+        // $bills = Bill::where('bill_id', $bill_id)
+        //                 ->join('items', 'items.id', '=', 'bills.item_number')
+        //                 ->select('bills.*', 'items.name as item_name')
+        //                 ->get();
+
+        $totals = BillItem::where('bill_id', $bill->id)->sum('price');
+        $bills = Bill::with('billItems','party')->find($bill->id); 
+        
         // Return the HTML content of the view
         $viewContent = view('orders.bill-print', compact('bills','orders','totals'))->render();
 
@@ -690,7 +767,29 @@ public function fetch_purchase_item_details(Request $request)
             
     
         }
+        Transaction::create([
+            'transaction_date' => Carbon::now(),
+            'type' => 'acc',
+            'debitor_id' => Party::RETURN,
+            'creditor_id' => $request->party_id,
+            // 'amt_credit' => $this->arraySum($request->total_prices),
+            'narration' => $request->narration,
+            'transaction_number' => Transaction::transactionNumber(),
+            'order_id' => implode(',', $request->order_id),
+            'is_paid' => 1
+        ]);
 
+        Transaction::create([
+            'transaction_date' => Carbon::now(),
+            'type' => 'acc',
+            'debitor_id' => $request->party_id,
+            'creditor_id' => Party::RETURN,
+            // 'amt_debt' => $this->arraySum($request->total_prices),
+            'narration' => $request->narration,
+            'transaction_number' => Transaction::transactionNumber(),
+            'order_id' => implode(',', $request->order_id),
+            'is_paid' => 1
+        ]);
         $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
                 ->groupBy('order_number')
                 ->where('bill_id',$bill_id)
@@ -738,34 +837,15 @@ public function fetch_purchase_item_details(Request $request)
     public function bill_prints(Request $request)
     {   
         $bill_id = $request->all();
-        
 
-        $data = Bill::where('bill_id', $bill_id['order'])
+        $bills = Bill::with('billItems','party')->where('bill_id', $bill_id['order'])
             ->orderBy('id', 'DESC')
             ->groupBy('order_number')
-            ->get();
+            ->first();
 
-        $orders = [];
+        $totals = BillItem::where('bill_id', $bills->id)->sum('price');
 
-        foreach ($data as $bill) {
-            $order = Order::where('id', $bill->order_number)->first();
-            if ($order) {
-                $orders[] = $order;
-            }
-        }
-
-        $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
-                ->groupBy('order_number')
-                ->where('bill_id',$bill_id['order'])
-                ->get();
-
-        $bills = Bill::where('bill_id', $bill_id)
-                        ->join('items', 'items.id', '=', 'bills.item_number')
-                        ->select('bills.*', 'items.name as item_name')
-                        ->get();
-  
-        // dd($order);
-
-        return view('orders.bill-print-outside', compact('bills','orders','totals'));
+        return view('orders.bill-print-outside', compact('bills','totals'));
     }
+
 }

@@ -137,10 +137,10 @@ body{
                     <i class="fa fa-user-friends me-2"></i><i class="fa fa-plus-circle" aria-hidden="true"></i> Create Direct Order
                 </a> -->
                 <a href="{{ route('order.sale.bills') }}" class="list-group-item list-group-item-action border-0">
-                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i> Sale BIlls
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i> Sale Bill
                 </a>
                 <a href="{{ route('order.purchase.bills') }}" class="list-group-item list-group-item-action border-0">
-                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Purchase Bills
+                    <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Purchase Bill
                 </a>
                 <a href="{{ route('direct.sale.listing') }}" class="list-group-item list-group-item-action border-0">
                     <i class="fa fa-user-friends me-2"></i><i class="fa fa-list" aria-hidden="true"></i>  Direct Bill

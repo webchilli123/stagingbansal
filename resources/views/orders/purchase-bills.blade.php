@@ -4,7 +4,7 @@
 <header class="d-flex justify-content-between align-items-center mb-4">
   <h5>Purchase Bills</h5>
   @can('create', App\Models\Order::class)
-    <a href="{{ route('bill.purchase.create') }}" class="btn btn-primary">Order</a>
+    <a href="{{ route('bill.purchase.create') }}" class="btn btn-primary">Create Purchase Bill</a>
   @endcan
 </header>
 

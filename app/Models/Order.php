@@ -16,7 +16,9 @@ class Order extends Model
 
     protected $dates = ['order_date', 'payment_date', 'due_date'];
 
-    protected $appends = ['entry_type_name'];
+    protected $appends = [
+        'entry_type_name'
+    ];
 
     // order status
     const PENDING = 'pending';
@@ -314,5 +316,7 @@ class Order extends Model
     public function getEntryTypeNameAttribute() {
         return ($this->entry_type == 1) ? 'Regular' : 'Direct';
     }
+
+    
 
 }

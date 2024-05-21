@@ -243,10 +243,11 @@
         if(partyId !== ''){
             // Fetch orders for the selected party via AJAX
             $.ajax({
-                url: '{{ route('get.order') }}',
+                url: '{{ route("get.order.by.party", ["type" => "purchase"]) }}',
                 type: 'GET',
                 data: { partyId: partyId }, // Send partyId as data
                 success: function(response){
+                    console.log(response);
                     // Clear existing options
                     $('#orders').empty();
                     $('#order tbody').empty();
@@ -356,10 +357,10 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.order_id + '</td>' + // Order ID
             '<td>' + item.item.name + '</td>' +
             '<td><input type="number" class="form-control received-quantity" value=""></td>' +
-            '<td>' + item.rate + '</td>' +
+            '<td>' + item.rate_formatted + '</td>' +
             '<td class="order-price"></td>' + // Leave order price cell empty initially
-            '<td>' + item.ordered_quantity + '</td>' +
-            '<td>' + item.total_price + '</td>' +
+            '<td>' + item.total_price_formatted + '</td>' +
+            '<td>' + item.total_price_formatted + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
             tableBody.append(row);
@@ -373,10 +374,10 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.order_id + '</td>' + // Order ID
             '<td>' + item.item.name + '</td>' +
             '<td><input type="number" class="form-control received-quantity" value=""></td>' +
-            '<td>' + item.rate + '</td>' +
+            '<td>' + item.rate_formatted + '</td>' +
             '<td class="order-price"></td>' + // Leave order price cell empty initially
-            '<td>' + item.ordered_quantity + '</td>' +
-            '<td>' + item.total_price + '</td>' +
+            '<td>' + item.total_price_formatted + '</td>' +
+            '<td>' + item.total_price_formatted + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
             rows += row; // Append current row to the rows string

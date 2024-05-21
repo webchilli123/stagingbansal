@@ -82,7 +82,7 @@
 </div>
 <div class="mb-3">
     <label for="" class="form-label">whatsApp Narration</label>
-    <textarea name="wa_narration" id="wa_narration" cols="30" rows="5" class="form-control">{{ $order->wa_narration ?? old('wa_narration') }}</textarea>
+    <textarea name="whats_app_narration" id="wa_narration" cols="30" rows="5" class="form-control">{{ $order->wa_narration ?? old('wa_narration') }}</textarea>
 </div>
 
 <button type="submit" class="btn btn-primary mb-5">{{ $mode == 'create' ? 'Save' : 'Update' }}</button>
@@ -244,7 +244,7 @@
         if(partyId !== ''){
             // Fetch orders for the selected party via AJAX
             $.ajax({
-                url: '{{ route('get.order') }}',
+                url: '{{ route("get.order",["type" => "sale"]) }}',
                 type: 'GET',
                 data: { partyId: partyId }, // Send partyId as data
                 success: function(response){
@@ -300,6 +300,8 @@ function formatOrderSelection (order) {
         type: 'GET',
         data: { orderNumber: orderNumber }, // Send single order number
         success: function(response){
+        console.log(response);
+        console.log(response);
             // Check if response contains items
             if(response.items.length > 0) {
                 updateTableWithItemDetails(response.items);
@@ -347,7 +349,7 @@ function updateTableWithItemDetails(items) {
     var tableBody = $('#order tbody');
     console.log("Updating table with item details:", items);
     var existingRows = tableBody.find('tr');
-
+    
     // Check if there are existing rows in the table
     if (existingRows.length > 0) {
         // Append new rows for the items to the existing table
@@ -357,10 +359,10 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.order_id + '</td>' + // Order ID
             '<td>' + item.item.name + '</td>' +
             '<td><input type="number" class="form-control received-quantity" value=""></td>' +
-            '<td>' + item.rate + '</td>' +
+            '<td>' + item.rate_formatted + '</td>' +
             '<td class="order-price"></td>' + // Leave order price cell empty initially
             '<td>' + item.ordered_quantity + '</td>' +
-            '<td>' + item.total_price + '</td>' +
+            '<td>' + item.total_price_formatted + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
             tableBody.append(row);
@@ -374,10 +376,10 @@ function updateTableWithItemDetails(items) {
             '<td>' + item.order_id + '</td>' + // Order ID
             '<td>' + item.item.name + '</td>' +
             '<td><input type="number" class="form-control received-quantity" value=""></td>' +
-            '<td>' + item.rate + '</td>' +
+            '<td>' + item.rate_formatted + '</td>' +
             '<td class="order-price"></td>' + // Leave order price cell empty initially
             '<td>' + item.ordered_quantity + '</td>' +
-            '<td>' + item.total_price + '</td>' +
+            '<td>' + item.total_price_formatted + '</td>' +
             '<td><i class="fas fa-trash-alt text-danger remove-item"></i></td>' +
             '</tr>';
             rows += row; // Append current row to the rows string
