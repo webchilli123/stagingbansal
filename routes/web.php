@@ -16,6 +16,10 @@ use App\Http\Controllers;
 Route::get('/linkstorage', function () {
     Artisan::call('storage:link', [] );
 });
+Route::get('migrate-table', function() {
+    Artisan::call('migrate');
+});
+
 Route::redirect('/', '/login');
 
 // login
