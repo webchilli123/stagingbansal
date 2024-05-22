@@ -461,7 +461,7 @@ class OrderController extends Controller
 
         $bills = Bill::with(['party'])
                         ->where('bill_type','purchase')
-                        ->orderBy('id', 'DESC')
+                        ->orderBy('id', 'desc')
                         ->groupBy('bill_id')
                         ->get();
 
@@ -750,7 +750,7 @@ public function fetch_purchase_item_details(Request $request)
 
         $bill = Bill::create([
             'bill_id' => $bill_id,
-            'bill_type' => 'sale',
+            'bill_type' => 'purchase',
             'party_id' => $request->party_id,
             'narration' => $request->narration,
             'whats_app_narration' => $request->whats_app_narration,
