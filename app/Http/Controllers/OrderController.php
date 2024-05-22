@@ -613,7 +613,7 @@ public function fetch_purchase_item_details(Request $request)
         } 
         $items = json_decode($fields['tableData']);
         
-        $bill_id = 'sale_bill-' . rand(1111, 9999);
+        $bill_id = 'sale_bill#' . rand(1111, 9999);
 
         $bill = Bill::create([
             'bill_id' => $bill_id,
@@ -746,59 +746,80 @@ public function fetch_purchase_item_details(Request $request)
 
         $items = json_decode($fields['tableData']);
         
-        $bill_id = 'purchase-' . rand(1111, 9999);
+        $bill_id = 'purchase_bill#' . rand(1111, 9999);
 
-        foreach($items as $data){
+        $bill = Bill::create([
+            'bill_id' => $bill_id,
+            'bill_type' => 'sale',
+            'party_id' => $request->party_id,
+            'narration' => $request->narration,
+            'whats_app_narration' => $request->whats_app_narration,
+        ]);
 
-            $bill = new Bill();
-            $bill->order_number = $data->{1}; 
-            $bill->item_number = $data->{0}; 
-            $bill->total_quantity = $data->{6};
-            $bill->sent_quantity = $data->{3};
-            $bill->rate = $data->{4}; 
-            $bill->total_price = $data->{3} * $data->{4}; 
-            $bill->narration = $fields['narration'];
-            $bill->whats_app_narration = $fields['wa_narration'];
-            $bill->bill_id = $bill_id;
-            $bill->bill_type = 'purchase';
-            $bill->party_id = $fields['party_id'];
+        if($bill){
+            foreach($items as $item){
+                BillItem::create([
+                    'bill_id' => $bill->id,
+                    'item_id' => $item->{0},
+                    'order_id' => $item->{1},
+                    'item' => $item->{2},
+                    'sent_quantity' => $item->{3},
+                    'rate' => $item->{4},
+                    'price' => $item->{5},
+                    'order_quantity' => $item->{6},
+                    'order_price' => $item->{7},
+                ]);
+            }
 
-            $bill->save();
+            Transaction::create([
+                'transaction_date' => Carbon::now(),
+                'type' => 'acc',
+                'debitor_id' => Party::RETURN,
+                'creditor_id' => $request->party_id,
+                // 'amt_credit' => $this->arraySum($request->total_prices),
+                'narration' => $request->narration,
+                'transaction_number' => Transaction::transactionNumber(),
+                'order_id' => implode(',', $request->order_id),
+                'is_paid' => 1
+            ]);
+    
+            Transaction::create([
+                'transaction_date' => Carbon::now(),
+                'type' => 'acc',
+                'debitor_id' => $request->party_id,
+                'creditor_id' => Party::RETURN,
+                // 'amt_debt' => $this->arraySum($request->total_prices),
+                'narration' => $request->narration,
+                'transaction_number' => Transaction::transactionNumber(),
+                'order_id' => implode(',', $request->order_id),
+                'is_paid' => 1
+            ]);
+
+        }
+
+        // foreach($items as $data){
+
+        //     $bill = new Bill();
+        //     $bill->order_number = $data->{1}; 
+        //     $bill->item_number = $data->{0}; 
+        //     $bill->total_quantity = $data->{6};
+        //     $bill->sent_quantity = $data->{3};
+        //     $bill->rate = $data->{4}; 
+        //     $bill->total_price = $data->{3} * $data->{4}; 
+        //     $bill->narration = $fields['narration'];
+        //     $bill->whats_app_narration = $fields['wa_narration'];
+        //     $bill->bill_id = $bill_id;
+        //     $bill->bill_type = 'purchase';
+        //     $bill->party_id = $fields['party_id'];
+
+        //     $bill->save();
             
     
-        }
-        Transaction::create([
-            'transaction_date' => Carbon::now(),
-            'type' => 'acc',
-            'debitor_id' => Party::RETURN,
-            'creditor_id' => $request->party_id,
-            // 'amt_credit' => $this->arraySum($request->total_prices),
-            'narration' => $request->narration,
-            'transaction_number' => Transaction::transactionNumber(),
-            'order_id' => implode(',', $request->order_id),
-            'is_paid' => 1
-        ]);
+        // }
+        
+        $totals = BillItem::where('bill_id', $bill->id)->sum('price');
 
-        Transaction::create([
-            'transaction_date' => Carbon::now(),
-            'type' => 'acc',
-            'debitor_id' => $request->party_id,
-            'creditor_id' => Party::RETURN,
-            // 'amt_debt' => $this->arraySum($request->total_prices),
-            'narration' => $request->narration,
-            'transaction_number' => Transaction::transactionNumber(),
-            'order_id' => implode(',', $request->order_id),
-            'is_paid' => 1
-        ]);
-        $totals = Bill::select('bill_id','order_number', DB::raw('SUM(total_price) as total_product_amount'))
-                ->groupBy('order_number')
-                ->where('bill_id',$bill_id)
-                ->get();
-
-        $bills = Bill::where('bill_id', $bill_id)
-                        ->join('items', 'items.id', '=', 'bills.item_number')
-                        ->select('bills.*', 'items.name as item_name')
-                        ->get();
+        $bills = Bill::with('billItems','party')->find($bill->id); 
                                    
                         
         // Return the HTML content of the view
