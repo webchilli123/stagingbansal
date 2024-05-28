@@ -3,9 +3,11 @@
 <a href="{{ route('orders.show', ['order' => $order]) }}" title='View' class="btn btn-sm text-primary"><i class="fa fa-eye"></i></a>
 
 @can('update', $order)
+@if($direct != 1)
 <a href="{{ route('orders.transfer.create', ['order' => $order]) }}" title='Transfer' class="btn btn-sm text-primary">
     <i class="fa fa-shopping-cart"></i>
 </a>
+@endif
 @endcan
 
 @can('update', $order)

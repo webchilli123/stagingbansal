@@ -28,7 +28,6 @@
                 <th>Order No.</th>
                 <th>Type</th>
                 <th>Status</th>
-                <th>Order Date</th>
                 <th>Due Date</th>
                 <th>Party Name</th>
             </tr>
@@ -38,7 +37,6 @@
                 <td>{{ $order->order_number }}</td>
                 <td>{{ ucfirst($order->type) }}</td>
                 <td><span class="badge alert-primary">{{ ucwords($order->status) }}</span></td>
-                <td>{{ $order->order_date->format('d M, Y') }}</td>
                 <td>{{ $order->due_date->format('d M, Y') }}</td>
                 <td>{{ $order->party->name }}</td>
             </tr>
@@ -305,7 +303,6 @@
                 <td>{{number_format($transaction->amt_debt,2) ?? 0}}</td>
                 <td>{{ $transaction->narration }}</td>
             </tr>
-            @break
             @endforeach
         </tbody>
     </table>

@@ -25,7 +25,7 @@ class OrderRequest extends FormRequest
     {
         return [
             'type' => 'required|max:50',
-            'order_date' => 'required|date',
+            // 'order_date' => 'required|date',
             'due_date' => 'required|date',
             'party_id' => 'required|integer',
             'narration' => 'nullable|max:6000',

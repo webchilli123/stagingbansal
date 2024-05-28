@@ -8,8 +8,8 @@
                 <th>Sent Quantity</th>
                 <th>Rate</th>
                 <th>Price</th>
-                <th>Order Quantity (Kg)</th>
-                <th>Order Price</th>
+                <th>Balance Quantity (Kg)</th>
+                <th>Balance Order Price</th>
                 <th>
                     <i class="fas fa-ellipsis-h text-secondary action-dropdown"></i>
                 </th>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,8 @@ class Order extends Model
     protected $dates = ['order_date', 'payment_date', 'due_date'];
 
     protected $appends = [
-        'entry_type_name'
+        'entry_type_name',
+        'order_date_formatted'
     ];
 
     // order status
@@ -106,6 +108,33 @@ class Order extends Model
                 $this->orderItems()->create([
                     'item_id' => $item,
                     'ordered_quantity' => $request->quantities[$i],
+                    'rate' => $request->rates[$i],
+                    'total_price' => $request->total_prices[$i],
+                ]);
+            }
+        }
+    }
+    public function createOrderItemsDirect($request)
+    {
+        if($request->deleted_items){
+            foreach ($request->deleted_items as $k => $deleted_items) {
+                $this->orderItems()->where('id',$deleted_items)->delete();
+            }
+        }
+        foreach ($request->items as $i => $item) {
+            if(!empty($request->old_id[$i])){
+                  $this->orderItems()->where('id',$request->old_id[$i])->update([
+                      'item_id' => $item,
+                      'ordered_quantity' => $request->quantities[$i],
+                      'received_quantity' => $request->quantities[$i],
+                      'rate' => $request->rates[$i],
+                      'total_price' => $request->total_prices[$i],
+                    ]);
+            }else{
+                $this->orderItems()->create([
+                    'item_id' => $item,
+                    'ordered_quantity' => $request->quantities[$i],
+                    'received_quantity' => $request->quantities[$i],
                     'rate' => $request->rates[$i],
                     'total_price' => $request->total_prices[$i],
                 ]);
@@ -315,6 +344,10 @@ class Order extends Model
 
     public function getEntryTypeNameAttribute() {
         return ($this->entry_type == 1) ? 'Regular' : 'Direct';
+    }
+
+    public function getOrderDateFormattedAttribute(){
+        return Carbon::parse($this->order_date)->format('d M, Y');
     }
 
     

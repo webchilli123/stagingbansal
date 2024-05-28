@@ -27,6 +27,7 @@
                     <div class="card-body">
                         <form action="{{route('orders.sales.submit')}}" method="post">
                             @csrf
+                            <input type="hidden" name="order_id" value="{{$order->id}}">
                             @foreach($transactiondata as $data)
 
                             <div class="row">
@@ -83,7 +84,7 @@
                             @endforeach
                             <div class="my-3">
                                 <label for="" class="form-label">Narration</label>
-                                <textarea name="narration" id="narration" cols="30" rows="5" class="form-control">{{$transactiondata[0]->transaction->narration ?? ''}}</textarea>
+                                <textarea name="narration" id="narration" cols="30" rows="5" class="form-control">{{$order->narration ?? ''}}</textarea>
                             </div>
                             <button class="btn btn-primary mt-2" type="submit">Submit</button>
                         </form>

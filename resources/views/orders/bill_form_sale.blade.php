@@ -80,10 +80,10 @@
     <label for="" class="form-label">Narration</label>
     <textarea name="narration" id="narration" cols="30" rows="5" class="form-control">{{ $order->narration ?? old('narration') }}</textarea>
 </div>
-<div class="mb-3">
+<!-- <div class="mb-3">
     <label for="" class="form-label">whatsApp Narration</label>
     <textarea name="whats_app_narration" id="wa_narration" cols="30" rows="5" class="form-control">{{ $order->wa_narration ?? old('wa_narration') }}</textarea>
-</div>
+</div> -->
 
 <button type="submit" class="btn btn-primary mb-5">{{ $mode == 'create' ? 'Save' : 'Update' }}</button>
 
@@ -254,7 +254,7 @@
                     // Append options for each order
                     $.each(response.orders, function (key, value) {
                         $('#orders').append(
-                            '<option value="' + value.id + '">' + value.order_number + '</option>'
+                            '<option value="' + value.id + '">' + value.order_number  + ' (' + value.order_date_formatted + ' )' + '</option>'
                         );
                     });
 

@@ -19,6 +19,7 @@ class OrderWhatsappController extends Controller
     public function __invoke(Request $request, Order $order)
     {
         $msg = $request->narration ?? ''; 
+        $order->update(['wa_narration' => $msg]);
         $order->load(['orderItems.item']);
         // if($order->transferTransactions()->count() > 0){
             $order->load([

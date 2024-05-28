@@ -22,12 +22,12 @@
             </select>
         </div>
 
-        <div class="col-md-6 col-lg-3 mb-3">
+        <!-- <div class="col-md-6 col-lg-3 mb-3">
             <label for="" class="form-label">Order Date</label>
             <input type="date" class="form-control" name="order_date" value="" required>
-        </div>
+        </div> -->
 
-        <div class="col-md-6 col-lg-3 mb-3">
+        <div class="col-md-6 col-lg-6 mb-3">
             <label for="" class="form-label">Date</label>
             <input type="date" class="form-control" name="due_date" value="" required>
         </div>
@@ -48,36 +48,6 @@
         </div>
     </section>
     @include('orders.order-items')
-    <div id="transportation" style="display: none;">
-    <h6 class="border-bottom pb-2 fw-bold mb-3">
-        <i class="fa fa-circle text-success me-1"></i> Transportation Information
-    </h6>
-    <div class="row mb-2">
-        <div class="col-lg-6 mb-3">
-            <label for="" class="form-label">Transport Name</label>
-            <select name="transport_id" class="form-control">
-                <option selected value="">Choose...</option>
-                @foreach($transports as $id => $transport)
-                <option {{ old('transport_id') == $id ? 'selected' : '' }} value="{{ $id }}">
-                    {{ $transport }}
-                </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-lg-6 mb-3">
-            <label for="" class="form-label">Bilty No.</label>
-            <input type="text" name="bilty_number" class="form-control">
-        </div>
-        <div class="col-lg-6 mb-3">
-            <label for="" class="form-label">Vehicle No.</label>
-            <input type="text" name="vehicle_number" class="form-control">
-        </div>
-        <div class="col-lg-6 mb-3">
-            <label for="" class="form-label">Transport Date</label>
-            <input type="date" name="transport_date" class="form-control">
-        </div>
-    </div>
-    </div>
 
     <footer class="d-flex justify-content-between mt-3 mt-lg-0 mb-4">
         <button class="btn btn-primary" id="add-row">
@@ -89,13 +59,42 @@
 
     </footer>
 
+    <div id="transportation" style="display: none;">
+        <h6 class="border-bottom pb-2 fw-bold mb-3">
+            <i class="fa fa-circle text-success me-1"></i> Transportation Information
+        </h6>
+        <div class="row mb-2">
+            <div class="col-lg-6 mb-3">
+                <label for="" class="form-label">Transport Name</label>
+                <select name="transport_id" class="form-control">
+                    <option selected value="">Choose...</option>
+                    @foreach($transports as $id => $transport)
+                    <option {{ old('transport_id') == $id ? 'selected' : '' }} value="{{ $id }}">
+                        {{ $transport }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-6 mb-3">
+                <label for="" class="form-label">Bilty No.</label>
+                <input type="text" name="bilty_number" class="form-control">
+            </div>
+            <div class="col-lg-6 mb-3">
+                <label for="" class="form-label">Vehicle No.</label>
+                <input type="text" name="vehicle_number" class="form-control">
+            </div>
+            <div class="col-lg-6 mb-3">
+                <label for="" class="form-label">Transport Date</label>
+                <input type="date" name="transport_date" class="form-control">
+            </div>
+        </div>
+    </div>
+
+    
+
     <div class="mb-3">
         <label for="" class="form-label">Narration</label>
         <textarea name="narration" id="narration" cols="30" rows="5" class="form-control"></textarea>
-    </div>
-    <div class="mb-3">
-        <label for="" class="form-label">whatsApp Narration</label>
-        <textarea name="wa_narration" id="wa_narration" cols="30" rows="5" class="form-control"></textarea>
     </div>
 
     <button type="submit" class="btn btn-primary mb-5">Save</button>
@@ -223,10 +222,10 @@
 
         $('#orderType').on('change', function() {
             var selectedValue = $(this).val();
-            
-            if(selectedValue == 'sale'){
+
+            if (selectedValue == 'sale') {
                 $('#transportation').css('display', 'block');
-            }else{
+            } else {
                 $('#transportation').css('display', 'none');
             }
         });

@@ -2,9 +2,9 @@
 @section('content')
 
 <header class="d-flex justify-content-between align-items-center mb-4">
-  <h5>Orders</h5>
+  <h5>Direct Orders</h5>
   @can('create', App\Models\Order::class)
-    <a href="{{ route('direct.sale.create') }}" class="btn btn-primary">Order</a>
+    <a href="{{ route('direct.sale.create') }}" class="btn btn-primary">Direct Order</a>
   @endcan
 </header>
 

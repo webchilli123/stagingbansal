@@ -66,6 +66,13 @@
                 <td>{{$item->price}}</td>
             </tr>
             @endforeach
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><b>Total</b></td>
+                <td><b>{{ number_format($totals, 2) }}</b></td>
+            </tr>
         </tbody>
     </table>
 </section>
@@ -77,10 +84,6 @@
 </h6>
 <p class="p-3 border mb-4">{{$bills->narration ?? ''}} </p>
 
-<h6 class="fw-bold mb-3">
-    <i class="fa fa-circle text-success me-1"></i> Whatsaap Narration
-</h6>
-<p class="p-3 border mb-4">{{$bills->whats_app_narration ?? ''}}</p>
 
 
 
@@ -111,47 +114,6 @@
     </div>
 </div>
 
-@if($totals)
-<h6 class="fw-bold mb-3">
-    <i class="fa fa-circle text-success me-1"></i> Account Vouchers
-</h6>
-<section class="table-responsive rounded mb-5">
-    <table class="table table-bordered" style="min-width: 60rem;">
-        <thead>
-            <tr>
-                <th>Voucher Date</th>
-                <th>Amount</th>
-                <th>Narration</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ date('d M, Y', strtotime($bills->created_at)) }}</td>
-                <td>{{number_format($totals,2) ?? 0}}</td>
-                <td> {{ $bills->narration }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
-
-@endif
-<h6 class="fw-bold mb-3">
-    <i class="fa fa-circle text-success me-1"></i> Total Amount
-</h6>
-<section class="table-responsive rounded mb-5">
-    <table class="table table-bordered" style="min-width: 60rem;">
-        <thead>
-            <tr>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>{{ number_format($totals, 2) }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
 
 @endsection
 
